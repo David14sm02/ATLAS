@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagrama ERD — ATLAS TECNM (Pantalla Completa)</title>
+    <!-- Mermaid.js v10 -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.0/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: auto;
+        }
+        /* Barra de control flotante */
+        .toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: #1e293b;
+            color: #ffffff;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.15);
+        }
+        .toolbar h1 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #38bdf8;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toolbar .actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .btn {
+            background-color: #334155;
+            color: #ffffff;
+            border: 1px solid #475569;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn:hover {
+            background-color: #475569;
+            border-color: #64748b;
+        }
+        .btn-primary {
+            background-color: #1B396A;
+            border-color: #2563eb;
+            color: #ffffff;
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+        .btn-success {
+            background-color: #1E5B4F;
+            border-color: #059669;
+        }
+        .btn-success:hover {
+            background-color: #047857;
+        }
+        /* Contenedor del lienzo */
+        .canvas-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+            background-color: #ffffff;
+            overflow: auto;
+        }
+        #diagram-target {
+            transform-origin: top center;
+            transition: transform 0.15s ease-out;
+            background-color: #ffffff;
+            padding: 20px;
+        }
+        svg {
+            max-width: none !important;
+            height: auto !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Barra de Herramientas -->
+    <div class="toolbar" id="toolbar">
+        <h1>📊 ATLAS TECNM — Diagrama Entidad-Relación (Esquema Estrella)</h1>
+        <div class="actions">
+            <button class="btn" onclick="zoomIn()" title="Acercar">🔍 Zoom (+)</button>
+            <button class="btn" onclick="zoomOut()" title="Alejar">🔍 Zoom (-)</button>
+            <button class="btn" onclick="resetZoom()" title="Restablecer">↺ Reiniciar</button>
+            <button class="btn btn-primary" onclick="toggleFullScreen()" title="Pantalla Completa">⛶ Pantalla Completa</button>
+            <button class="btn btn-success" onclick="downloadSVG()" title="Descargar Imagen">💾 Guardar SVG</button>
+        </div>
+    </div>
+
+    <!-- Lienzo del Diagrama -->
+    <div class="canvas-wrapper">
+        <div id="diagram-target">
+            <pre class="mermaid">
+erDiagram
+    CAT_EJES ||--o{ CAT_SUBMODULOS : "agrupa"
+    CAT_ENTIDADES ||--o{ CAT_PLANTELES : "ubica"
+    CAT_PLANTELES ||--o{ USERS : "asigna tenant"
+    CAT_PLANTELES ||--o{ REP_REGISTROS_BASE : "reporta"
+    CAT_SUBMODULOS ||--o{ REP_REGISTROS_BASE : "clasifica"
+    CAT_PERIODOS ||--o{ REP_REGISTROS_BASE : "temporaliza"
+    USERS ||--o{ REP_REGISTROS_BASE : "captura"
+    CAT_PLANTELES ||--o{ REP_BITACORA_CARGAS : "ingesta"
+    USERS ||--o{ REP_BITACORA_CARGAS : "ejecuta"
+
+    CAT_EJES {
+        bigint id PK
+        string clave "UK EJE-01, EJE-02..."
+        string nombre
+        string icono
+        int orden
+    }
+
+    CAT_SUBMODULOS {
+        bigint id PK
+        bigint eje_id FK
+        string clave "UK 1.1, 2.2, 3.1..."
+        string nombre
+        boolean activo_mvp
+    }
+
+    CAT_ENTIDADES {
+        bigint id PK
+        string clave_inegi "UK 01 a 32"
+        string nombre
+        string abreviatura
+    }
+
+    CAT_PLANTELES {
+        bigint id PK
+        bigint entidad_id FK
+        string clave_tecnm "UK Clave oficial"
+        string nombre
+        string sostenimiento "FEDERAL / DESCENTRALIZADO"
+        string municipio
+        decimal latitud
+        decimal longitud
+    }
+
+    CAT_PERIODOS {
+        bigint id PK
+        int anio "2026"
+        smallint trimestre "1, 2, 3, 4"
+        date fecha_inicio
+        date fecha_limite
+        boolean bloqueado
+    }
+
+    USERS {
+        bigint id PK
+        bigint plantel_id FK "Nullable Nacional"
+        string name
+        string email "UK"
+        string password
+    }
+
+    REP_REGISTROS_BASE {
+        bigint id PK
+        bigint plantel_id FK
+        bigint submodulo_id FK
+        bigint periodo_id FK
+        bigint user_id FK
+        string estado "BORRADOR / PUBLICADO"
+        int docentes_mujeres
+        int docentes_hombres
+        int estudiantes_mujeres
+        int estudiantes_hombres
+        int total_docentes "GENERATED ALWAYS"
+        int total_estudiantes "GENERATED ALWAYS"
+        int total_general "GENERATED ALWAYS"
+        jsonb detalles_adicionales "GIN Indexed"
+    }
+
+    REP_BITACORA_CARGAS {
+        bigint id PK
+        bigint plantel_id FK
+        bigint user_id FK
+        string archivo_nombre
+        string estatus "EXITOSO / CON_ERRORES / FALLIDO"
+        int filas_procesadas
+        int filas_con_error
+        jsonb errores_detalle
+    }
+            </pre>
+        </div>
+    </div>
+
+    <script>
+        // Inicializar Mermaid con renderizado limpio
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            er: {
+                useMaxWidth: false,
+                fontSize: 14
+            }
+        });
+
+        // Controles de Zoom
+        let currentScale = 1.0;
+        const target = document.getElementById('diagram-target');
+
+        function zoomIn() {
+            currentScale += 0.15;
+            target.style.transform = `scale(${currentScale})`;
+        }
+
+        function zoomOut() {
+            if (currentScale > 0.3) {
+                currentScale -= 0.15;
+                target.style.transform = `scale(${currentScale})`;
+            }
+        }
+
+        function resetZoom() {
+            currentScale = 1.0;
+            target.style.transform = 'scale(1)';
+        }
+
+        // Pantalla Completa
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`Error al activar pantalla completa: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // Descargar SVG vectorial directamente
+        function downloadSVG() {
+            const svgElement = document.querySelector('.canvas-wrapper svg');
+            if (!svgElement) {
+                alert('El diagrama aún se está procesando...');
+                return;
+            }
+            const svgData = new XMLSerializer().serializeToString(svgElement);
+            const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'diagrama_erd_atlas_tecnm.svg';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

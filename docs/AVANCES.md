@@ -3,7 +3,7 @@
 **Proyecto:** ATLAS TECNM (Plataforma de Indicadores Nacionales del TecNM)  
 **Ubicación:** `d:\data\ATLAS TECM`  
 **Responsable:** Fábrica de Software  
-**Estatus General:** Identidad Gráfica Oficial, Clusters y Recursos Funcionales Listos (Semana 2)  
+**Estatus General:** Tablero Directivo Nacional Concluido (3 Bloques Activos - Listo para Presentación)  
 
 ---
 
@@ -14,9 +14,9 @@
 | **Hito 0** | 19/Sep/2026 | Arquitectura conceptual, catálogo oficial de 35 submódulos y diseño de BD | **COMPLETADO** |
 | **Hito 1** | 19/Sep/2026 | Inicialización de Laravel 11, entorno local (Herd), panel Filament v3 y Git | **COMPLETADO** |
 | **Hito 2** | 22/Sep/2026 | Ejecución de 10 Migraciones y 4 Seeders en Neon PostgreSQL | **COMPLETADO** |
-| **Hito 3** | 22/Sep/2026 | 4 Clusters, Modelos Eloquent, Recursos MVP (MTE y COMEXTRAS) e Identidad TecNM Oficial | **COMPLETADO** |
-| **Hito 4** | Pendiente | Ingesta asíncrona de archivos Excel con validación en segundo plano (*dry-run*) | *PENDIENTE (Por revisar con el equipo)* |
-| **Hito 5** | Pendiente | Tablero Nacional Directivo: KPIs, semáforos y mapa coropléjico con Apache ECharts | *Pendiente* |
+| **Hito 3** | 22/Sep/2026 | 4 Clusters, Modelos Eloquent, Recursos MVP e Identidad TecNM Oficial | **COMPLETADO** |
+| **Hito 4** | Pendiente | Ingesta asíncrona de archivos Excel con validación en segundo plano (*dry-run*) | *PENDIENTE (Por acordar con el equipo)* |
+| **Hito 5** | 23/Sep/2026 | Tablero Directivo Nacional (Propuesta C - Storytelling UX en 3 Bloques) | **COMPLETADO** |
 
 ---
 
@@ -40,7 +40,6 @@
 * **Fecha:** 22 de Septiembre de 2026
 * **Responsable:** Fábrica de Software
 * **Objetivo:** Ejecución y población exitosa del esquema relacional en Neon Serverless.
-* **Resultado:** 10 migraciones completadas al 100%, 4 seeders ejecutados (Ejes, Submódulos, Entidades y Periodos) y creación del usuario administrador institucional.
 
 ---
 
@@ -48,35 +47,56 @@
 * **Fecha:** 22 de Septiembre de 2026
 * **Responsable:** Fábrica de Software
 * **Objetivo:** Construir la navegación institucional, recursos de captura del MVP y adopción estricta del Manual de Identidad Gráfica TecNM 2026.
-
-#### 1. Entregables y Archivos Creados:
-1. **Adopción del Manual de Identidad Gráfica TecNM 2026:**
-   * Tipografía oficial obligatoria: **Noto Sans** (MIG Pág. 10).
-   * Paleta institucional: Azul TecNM (`#1B396A` Pantone 294 C), Gris Institucional (`#807E82` Cool Gray 10 C), Dorado (`#A57F2C`), Verde oficial (`#1E5B4F`) y Guinda (`#9B2247`).
-   * Acrónimo oficial: **ATLAS TecNM**.
-   * Lema institucional inyectado en el pie de página: *"EXCELENCIA EN EDUCACIÓN TECNOLÓGICA®"*.
-2. **Modelos Eloquent en `app/Models/`:**
-   * `User.php` (Multi-Tenancy con `plantel_id`).
-   * `CatEje.php`, `CatSubmodulo.php`, `CatEntidad.php`, `CatPlantel.php`, `CatPeriodo.php`.
-   * `RepRegistroBase.php` (Tabla de hechos con casts JSONB y scopes).
-   * `RepBitacoraCarga.php` (Auditoría de cargas).
-3. **Navegación por Clusters Oficiales (`app/Filament/Clusters/`):**
-   * `VinculacionEstrategica` (Eje 1).
-   * `InnovacionEmprendimiento` (Eje 2).
-   * `IntercambioAcademico` (Eje 3).
-   * `Extension` (Eje 4).
-4. **Recursos Funcionales del MVP:**
-   * `MteResource` (Submódulo 2.2): Formulario reactivo Livewire con sumatorias por género en vivo, cálculo total, atributos de incubación en JSONB, subida de evidencias PDF/Excel y tabla administrativa con filtros.
-   * `ComextrasResource` (Submódulo 3.1): Captura de movilidad y actividades extraescolares (deportivas, culturales, cívicas) en JSONB con evidencias y estatus de reporte.
-5. **Vistas Institucionales de Submódulos ("Fase 2"):**
-   * Vista Blade `submodulos-overview.blade.php` con diseño institucional y tarjetas interactivas para los 33 submódulos fuera del MVP.
+* **Documentación Creada:** `docs/MANUAL_TECNICO_DESARROLLADORES.md` (8 módulos de onboarding y arquitectura).
 
 ---
 
 ### [Hito 4] - Ingesta Asíncrona de Archivos Excel (*Dry-Run*)
 * **Estatus:** **PENDIENTE (Por revisar y validar con el equipo)**
-* **Puntos de Análisis para la Mesa de Trabajo con el Team:**
-  1. Definir los formatos de Excel específicos que se recibirán (ej. `F.37`, `F.32` u otros formatos oficiales).
-  2. Determinar si se entregará a los planteles una plantilla canónica estandarizada descargable desde la misma plataforma.
-  3. Definir las tolerancias de validación (celdas vacías, acentos, nombres de tecnológicos con discrepancias tipográficas).
-  4. Flujo de aprobación tras el *Dry-Run* (si el usuario aprueba manualmente la importación al ver el preview o si se inserta automáticamente al pasar todas las pruebas).
+
+---
+
+### [Hito 5] - Tablero Directivo Nacional (Storytelling UX)
+* **Fecha:** 23 de Septiembre de 2026
+* **Responsable:** Fábrica de Software
+* **Objetivo:** Construir el Dashboard principal de Nivel 1 (Dirección General del TecNM) bajo la **Propuesta C: Narrativa Ejecutiva por Bloques Temáticos**.
+
+#### 1. Entregables y Archivos Creados:
+1. `docs/diseno_tablero_directivo_nacional.md`:
+   * Especificación funcional y tokens de diseño para los 3 bloques narrativos.
+   * Análisis de compatibilidad de mapas vectoriales (Apache ECharts sobre SVG/Canvas nativo con claves INEGI `01` a `32`).
+2. **Bloque 1: Pulso Nacional y Semáforo de Cumplimiento:**
+   * `app/Filament/Widgets/PulsoNacionalWidget.php`: Lógica reactiva que calcula en tiempo real:
+     * Días restantes del corte trimestral activo (Q3 2026).
+     * Semáforo de los 263 planteles: Publicados (Verde `#1E5B4F`), En Borrador (Dorado `#A57F2C`) y Rezagados (Guinda `#9B2247`).
+     * % de Cobertura Nacional y barra de avance animada.
+     * Conteo consolidado de población participante (Docentes vs. Estudiantes) y barra de paridad de género.
+   * `resources/views/filament/widgets/pulso-nacional-widget.blade.php`: Vista Blade con diseño institucional de alto impacto, degradado oficial Azul TecNM y badges de estado.
+   * Registro en `AdminPanelProvider.php`.
+
+3. **Bloque 2: Cartografía y Despliegue Territorial:**
+   * `public/js/maps/mexico.json`: Cartografía vectorial oficial de las 32 entidades federativas optimizada con atributos `name` e `clave_inegi` (`01` a `32`).
+   * `public/js/echarts.min.js`: Librería Apache ECharts v5.5.1 empaquetada localmente para garantizar independencia de CDN y carga instantánea.
+   * `public/js/leaflet/leaflet.js` y `leaflet.css`: Motor cartográfico Leaflet v1.9.4 integrado localmente para renderizado geográfico real.
+   * `public/js/maps/mexico.json`: Cartografía vectorial oficial de las 32 entidades federativas optimizada con atributos `name` e `clave_inegi` (`01` a `32`).
+   * `app/Filament/Widgets/MapaRepublicaWidget.php`: Componente Livewire que gestiona:
+     * Filtros cruzados dinámicos por Submódulo (Todos, 2.2 MTE, 3.1 COMEXTRAS) y Sostenimiento (Federal vs. Descentralizado).
+     * Mapeo geográfico de las 32 entidades con agregación de planteles y registros de captura.
+     * Selección interactiva de estado con actualización reactiva en tiempo real.
+     * Respaldo de metas oficiales para los 263 institutos federales y descentralizados.
+   * `resources/views/filament/widgets/mapa-republica-widget.blade.php`: Vista interactiva montada en **Leaflet.js** con capa base **ESRI ArcGIS Dark Canvas**, escala de calor en gradiente Azul TecNM (`#1B396A`), bordes dorados (`#A57F2C`), controles flotantes de zoom/recentrado, tooltip interactivo que sigue el cursor y panel lateral con semáforo local estatal y desglose de institutos.
+   * Registro activo en `app/Providers/Filament/AdminPanelProvider.php`.
+
+4. **Bloque 3: Inclusión, Paridad de Género y Sectores Estratégicos:**
+   * `app/Filament/Widgets/InclusionSectoresWidget.php`: Componente Livewire analítico que consolida:
+     * Métricas de paridad de género en la población estudiantil (% Mujeres vs. % Hombres).
+     * Métricas de paridad de género en la plantilla docente (% Mujeres vs. % Hombres) y diagnóstico de brecha.
+     * Distribución porcentual y conteo de proyectos en sectores estratégicos (MTE 2.2: TI y Software, Agroindustria, Energía, Aeroespacial, Salud).
+     * Distribución de participantes en disciplinas formativas integrales (COMEXTRAS 3.1: Deporte, Cultura, Cívico, Movilidad Internacional y Nacional).
+   * `resources/views/filament/widgets/inclusion-sectores-widget.blade.php`: Vista en cuadrícula de 3 columnas con barras de progreso bicolores institucionales, badges de ponderación y adaptación completa a modo claro y oscuro sin emojis.
+   * Registro activo en `app/Providers/Filament/AdminPanelProvider.php`.
+
+* **Estatus del Hito 5:** **CONCLUIDO EXITOSAMENTE**. Tablero Directivo Nacional 100% operativo con la narrativa ejecutiva de los 3 bloques.
+
+---
+*(Siguiente hito del roadmap: Retomar Hito 4 - Ingesta Asíncrona de Excel F.37 / F.32 tras validación de plantillas con el equipo).*

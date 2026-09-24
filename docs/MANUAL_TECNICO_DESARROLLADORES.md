@@ -19,7 +19,7 @@ Históricamente, la Dirección General recolectaba información operativa y de v
 
 ### La Misión de ATLAS TecNM
 **ATLAS TecNM no es un sistema escolar transaccional (OLTP).** Es un **Data Mart Directivo y de Inteligencia de Negocios (BI)** diseñado para:
-1. Proveer a oficinas centrales tableros interactivos con **mapas coropléjicos de México** (vía Apache ECharts).
+1. Proveer a oficinas centrales tableros interactivos con **mapas coropléjicos de México** (vía Leaflet.js y capas vectoriales GeoJSON).
 2. Generar **semáforos de cumplimiento trimestral** (Q1 a Q4) por plantel y por estado.
 3. Permitir analítica cruzada instantánea por género (Docentes y Estudiantes) y sostenimiento institucional (**Federal** vs. **Descentralizado**).
 
@@ -29,14 +29,15 @@ Históricamente, la Dirección General recolectaba información operativa y de v
 
 El proyecto está construido sobre estándares modernos y probados del ecosistema PHP/Laravel:
 
-| Componente | Tecnología | Versión | Propósito |
-| :--- | :--- | :--- | :--- |
-| **Lenguaje** | PHP | `8.4+` | Backend de alto rendimiento (ejecutado con Laravel Herd). |
-| **Framework** | Laravel | `11.x` | Núcleo de la aplicación, ORM Eloquent, Jobs y colas. |
-| **Panel Administrativo** | Filament PHP | `v3.3+` | Framework TALL Stack para CRUDs reactivos y tableros. |
-| **Capa Reactiva** | Livewire | `v3.8+` | Reactividad en tiempo real sin escribir APIs complejas de JS. |
-| **Base de Datos** | PostgreSQL (Neon) | `16.x` | Base de datos serverless con soporte nativo de JSONB y columnas generadas. |
-| **Estilos y UI** | Tailwind CSS | `v3.x` | Diseño adaptado al Manual de Identidad Gráfica oficial TecNM 2026. |
+| Componente               | Tecnología        | Versión  | Propósito                                                                        |
+| :-------------------------| :------------------| :---------| :---------------------------------------------------------------------------------|
+| **Lenguaje**             | PHP               | `8.4+`   | Backend de alto rendimiento (ejecutado con Laravel Herd).                        |
+| **Framework**            | Laravel           | `11.x`   | Núcleo de la aplicación, ORM Eloquent, Jobs y colas.                             |
+| **Panel Administrativo** | Filament PHP      | `v3.3+`  | Framework TALL Stack para CRUDs reactivos y tableros.                            |
+| **Capa Reactiva**        | Livewire          | `v3.8+`  | Reactividad en tiempo real sin escribir APIs complejas de JS.                    |
+| **Base de Datos**        | PostgreSQL (Neon) | `16.x`   | Base de datos serverless con soporte nativo de JSONB y columnas generadas.       |
+| **Cartografía**          | Leaflet.js + ESRI | `v1.9.4` | Despliegue territorial interactivo, proyección GeoJSON y capas geográficas base. |
+| **Estilos y UI**         | Tailwind CSS      | `v3.x`   | Diseño adaptado al Manual de Identidad Gráfica oficial TecNM 2026.               |
 
 ---
 
@@ -63,7 +64,7 @@ Asegúrate de configurar la conexión directa a Neon PostgreSQL en `.env`:
 DB_CONNECTION=pgsql
 DB_URL="postgresql://neondb_owner:PASSWORD@ep-quiet-thunder-awveex94.c-12.us-east-1.aws.neon.tech/neondb?sslmode=require"
 ```
-> ⚠️ **REGLA CRÍTICA DE NEON:**  
+> **REGLA CRITICA DE NEON:**  
 > Para ejecutar migraciones y seeders, **NUNCA utilices el host con `-pooler`** (PgBouncer bloquea transacciones DDL de creación de tablas). Utiliza siempre la **conexión directa**.
 
 ### Paso 3: Ejecutar Migraciones y Seeders Maestros
@@ -96,17 +97,17 @@ Para mantener el orden arquitectónico, el código se estructura estrictamente e
 ATLAS TECM/
 ├── app/
 │   ├── Filament/
-│   │   └── Clusters/                          # 📁 Los 4 Ejes Rectores del TecNM
+│   │   └── Clusters/                          # Los 4 Ejes Rectores del TecNM
 │   │       ├── VinculacionEstrategica.php     # Cluster Eje 1
 │   │       ├── InnovacionEmprendimiento.php   # Cluster Eje 2
 │   │       │   └── Resources/
-│   │       │       └── MteResource.php        # ⭐ Recurso Funcional MVP (Submódulo 2.2)
+│   │       │       └── MteResource.php        # Recurso Funcional MVP (Submódulo 2.2)
 │   │       ├── IntercambioAcademico.php       # Cluster Eje 3
 │   │       │   └── Resources/
-│   │       │       └── ComextrasResource.php  # ⭐ Recurso Funcional MVP (Submódulo 3.1)
+│   │       │       └── ComextrasResource.php  # Recurso Funcional MVP (Submódulo 3.1)
 │   │       └── Extension.php                  # Cluster Eje 4
 │   │
-│   ├── Models/                                # 📁 Modelos Eloquent
+│   ├── Models/                                # Modelos Eloquent
 │   │   ├── User.php                           # Usuarios con Multi-Tenancy (plantel_id)
 │   │   ├── CatEje.php                         # Catálogo de Ejes
 │   │   ├── CatSubmodulo.php                   # Catálogo de los 35 Submódulos
@@ -123,7 +124,7 @@ ATLAS TECM/
 │   ├── migrations/                            # 10 migraciones ordenadas secuencialmente
 │   └── seeders/                               # Seeders maestros de catálogos
 │
-├── docs/                                      # 📁 Acervo Documental Oficial
+├── docs/                                      # Acervo Documental Oficial
 │   ├── AVANCES.md                             # Bitácora histórica obligatoria por sprint
 │   ├── Análisis.md                            # Documento conceptual y visión estratégica
 │   ├── arquitectura_bd.md                     # Especificación técnica DDL y ERD de Base de Datos
@@ -259,3 +260,90 @@ Todo desarrollo visual en la plataforma debe cumplir con el **Manual de Identida
      ```
 3. **Registro Obligatorio de Avances:**
    * Cada tarea o sprint finalizado debe asentarse en **`docs/AVANCES.md`**, describiendo la fecha, hito, archivos modificados y próximos pasos.
+
+---
+
+## 9. Arquitectura del Tablero Directivo Nacional (Hito 5 - Storytelling UX)
+
+El Tablero Directivo Nacional de **ATLAS TecNM** (disponible en la ruta `/admin`) fue concebido bajo el concepto de **Storytelling UX (Narrativa Ejecutiva en 3 Bloques)**. Su propósito es responder en menos de 10 segundos las tres preguntas críticas de la Dirección General del TecNM:
+
+1. **¿Cómo vamos a nivel nacional?** (Semáforo de cumplimiento institucional de los 263 planteles).
+2. **¿Dónde están los focos de atención territorial?** (Cartografía interactiva por entidad federativa).
+3. **¿Cuál es el impacto sustantivo de los programas?** (Paridad de género y vocación técnica/deportiva).
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ BLOQUE 1: Pulso Nacional (Corte trimestral, 263 planteles, KPIs de paridad)    │
+├───────────────────────────────────────────────────────┬─────────────────────────┤
+│ BLOQUE 2: Cartografía Nacional (Leaflet + ESRI Canvas) │ Panel Detalle Estatal   │
+│ • 32 entidades con gradiente Azul TecNM (#1B396A)      │ • Semáforo local        │
+│ • Tooltips enriquecidos al pasar cursor               │ • Federales vs Descen.  │
+│ • Filtros por submódulo (MTE/COMEXTRAS) y sostenimiento│ • Top 5 de cobertura    │
+├───────────────────────────────────────────────────────┴─────────────────────────┤
+│ BLOQUE 3: Analítica de Inclusión, Paridad y Sectores Estratégicos              │
+│ • Equidad Estudiantes / Docentes  • Sectores MTE 2.2  • Modalidades COMEXTRAS   │
+└─────────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Componente 1: `PulsoNacionalWidget`
+* **Archivo PHP:** `app/Filament/Widgets/PulsoNacionalWidget.php`
+* **Vista Blade:** `resources/views/filament/widgets/pulso-nacional-widget.blade.php`
+* **Lógica clave:**
+  * Determina el periodo trimestral activo mediante `CatPeriodo::where('bloqueado', false)` y calcula los días restantes antes del cierre.
+  * Monitorea la meta de los **263 planteles** divididos en:
+    * **Publicados:** Planteles con al menos un reporte oficializado en el trimestre actual (Verde `#1E5B4F`).
+    * **En Borrador:** Planteles que han iniciado captura pero no han concluido (Dorado `#A57F2C`).
+    * **Sin Reporte:** Planteles rezagados sin actividad registrada (Guinda `#9B2247`).
+  * Consolida la sumatoria de personas reportadas (Personal Docente + Comunidad Estudiantil) y calcula el ratio de paridad global.
+
+### Componente 2: `MapaRepublicaWidget`
+* **Archivo PHP:** `app/Filament/Widgets/MapaRepublicaWidget.php`
+* **Vista Blade:** `resources/views/filament/widgets/mapa-republica-widget.blade.php`
+* **Lógica y Arquitectura Cartográfica:**
+  * **Motor:** Leaflet v1.9.4 empaquetado localmente en `public/js/leaflet/`.
+  * **Capa Base:** Mosaicos vectoriales de alta fidelidad **ESRI ArcGIS Dark Gray Canvas** (`World_Dark_Gray_Base`), libre de marcas de agua y optimizada para temas oscuros.
+  * **Capa Vectorial:** Vector oficial GeoJSON de las 32 entidades federativas (`public/js/maps/mexico.json`). Cada polígono contiene la clave INEGI oficial (`01` al `32`).
+  * **Reactividad Bidireccional:**
+    * Al hacer clic en un estado en el mapa de Leaflet, se emite el método Livewire `selectEstado(claveInegi)`.
+    * El panel lateral derecho se actualiza al instante con el semáforo local, desglose de institutos federales vs. descentralizados y población participante.
+    * Si el usuario selecciona un estado desde el listado Top 5, Leaflet detecta el cambio reactivo mediante `$watch('selectedClave')`, hace zoom suave y enfoca la entidad seleccionada.
+  * **Filtros cruzados:** Selector dinámico por Submódulo (MTE 2.2, COMEXTRAS 3.1) y Sostenimiento (Federal vs. Descentralizado).
+
+### Componente 3: `InclusionSectoresWidget`
+* **Archivo PHP:** `app/Filament/Widgets/InclusionSectoresWidget.php`
+* **Vista Blade:** `resources/views/filament/widgets/inclusion-sectores-widget.blade.php`
+* **Lógica clave:**
+  * **Paridad de Género:** Calcula de forma desagregada el porcentaje de mujeres y hombres en estudiantes y en personal docente, generando el diagnóstico institucional de brecha.
+  * **Sectores MTE (2.2):** Agrupa los proyectos registrados en el atributo JSONB `datos_especificos['sector_estrategico']` en las 5 vocaciones clave: TI y Software, Agroindustria, Energía, Manufactura Avanzada/Aeroespacial y Salud.
+  * **Modalidades COMEXTRAS (3.1):** Agrupa la participación del atributo JSONB `datos_especificos['tipo_modalidad']` (Deportiva, Cultural, Cívica, Movilidad Internacional y Nacional).
+  * **Respaldo estadístico:** Cuando no hay capturas aún en la base de datos, el widget presenta benchmarks institucionales ponderados para garantizar que el tablero siempre brinde valor visual y analítico.
+
+---
+
+## 10. Guía de Presentación Técnica para la Reunión con el Equipo
+
+Para tu reunión con el equipo de desarrollo y liderazgo técnico, apóyate en esta estructura clara y contundente:
+
+### 1. El Porqué del Proyecto (Elevator Pitch)
+* *"Pasamos de hojas de cálculo aisladas (F.37 y F.32) a un Data Mart institucional centralizado sobre PostgreSQL 16 y Laravel 11/Filament v3."*
+* *"El sistema está diseñado para que la Dirección General conozca en tiempo real el estatus de los 263 institutos tecnológicos en los 4 ejes institucionales."*
+
+### 2. Demostración en Vivo del Tablero Directivo (`/admin`)
+* **Bloque 1 (Pulso Nacional):**
+  * Mostrar el corte activo y la cuenta regresiva de días.
+  * Resaltar el semáforo institucional: Publicados (Verde), Borrador (Dorado), Sin Reporte (Guinda) sobre la meta de 263 planteles.
+* **Bloque 2 (Cartografía con Leaflet):**
+  * Demostrar la navegación geográfica fluida en México sobre la capa ESRI Dark Canvas.
+  * Mostrar el hover sobre los estados (ej. Veracruz, Jalisco, CDMX) con sus tooltips informativos.
+  * Dar clic en un estado para ver cómo el panel lateral fija el semáforo local y el desglose de institutos federales vs. descentralizados.
+  * Demostrar la sincronización inversa: hacer clic en el Top 5 para que el mapa vuele automáticamente a ese estado.
+  * Probar los filtros superiores (cambiar entre Submódulos y Sostenimiento).
+* **Bloque 3 (Inclusión y Sectores):**
+  * Presentar la analítica de paridad por género diferenciando estudiantes de docentes.
+  * Mostrar la distribución de vocaciones de proyectos MTE y disciplinas formativas COMEXTRAS.
+
+### 3. Puntos Fuertes de Arquitectura para el Equipo
+* **Zero Dependencies externas críticas:** Leaflet, el GeoJSON y los estilos están empaquetados localmente en el repositorio.
+* **Extensibilidad JSONB:** Los submódulos nuevos solo definen sus atributos en `datos_especificos` sin requerir migraciones complejas continuas.
+* **Multi-Tenancy transparente:** El campo `plantel_id` en la tabla `users` determina si el usuario ve toda la República (Dirección General) o únicamente su propio instituto (Director de Plantel / Capturista).
+* **Estandarización de código:** Todo el código sigue PSR-12 formateado automáticamente con Laravel Pint (`vendor/bin/pint --format agent`).

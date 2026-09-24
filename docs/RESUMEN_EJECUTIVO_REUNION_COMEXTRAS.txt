@@ -1,0 +1,290 @@
+================================================================================
+ATLAS TECNM — PLATAFORMA DE INDICADORES Y GESTIÓN INSTITUCIONAL
+DOSSIER EJECUTIVO DE AVANCES PARA PRESENTACIÓN OFICIAL
+PROCESO ASIGNADO: COMEXTRAS (COMISIONES AL EXTRANJERO — SUBMÓDULO 3.1)
+================================================================================
+
+PROYECTO:       ATLAS TECNM
+MÓDULO:         Eje 3: Intercambio Académico -> 3.1 COMEXTRAS
+SESIÓN:         Reunión Técnica de Avances (Viernes 9:00 AM)
+RESPONSABLE:    Célula de Desarrollo e Ingeniería COMEXTRAS
+AUDIENCIA:      Dirección General del TecNM, Dirección de Vinculación y Equipo ATLAS
+FORMATO:        Documento de Texto estructurado con recuadros para capturas de pantalla
+                (Optimizado para copiar/pegar en Word, Google Docs y exportar a PDF)
+
+================================================================================
+ORDEN DEL DÍA (AGENDA OFICIAL DE LA REUNIÓN)
+================================================================================
+
+1. Avances en el análisis del proceso asignado y datos para el diseño de la BD
+2. Elección del logotipo institucional
+3. Inicio de la maquetación (Prototipo funcional / Frontend)
+
+================================================================================
+PUNTO 1: ANÁLISIS DEL PROCESO COMEXTRAS Y DISEÑO DE BASE DE DATOS
+================================================================================
+
+1.1 PROPÓSITO SUSTANTIVO DEL PROCESO:
+El proceso COMEXTRAS norma y gestiona las solicitudes de autorización para que
+docentes y estudiantes de los 263 Institutos Tecnológicos, Centros y Unidades del
+TecNM realicen actividades académicas, científicas, técnicas, deportivas o
+culturales fuera del territorio nacional con aval formal de la Dirección General.
+
+1.2 NORMATIVA Y ACERVO DOCUMENTAL ANALIZADO:
+- Circular Oficial 0045_COMEXTRAS: Disposiciones de austeridad y lineamientos vigentes.
+- Manual de Procedimiento COMEXTRA: Tiempos normativos y facultades de dictaminación.
+- Formatos de Solicitud TecNM 2026: Guías oficiales diferenciadas para personal docente
+  y comunidad estudiantil.
+- Macro-Base Histórica Nacional ("BASE COMEXTRAS 2026.xlsm" — 22.9 MB): Análisis de más
+  de 30 atributos históricos de comisiones internacionales reportadas por los planteles.
+- Oficio Resolutivo Tipo (Ejemplo 00697): Estructura del oficio final con folio nacional
+  institucional M00/XXXX/2026 emitido por la Dirección General.
+
++------------------------------------------------------------------------------+
+| [INSERTAR CAPTURA DE PANTALLA 1: EVIDENCIA DOCUMENTAL Y NORMATIVA COMEXTRAS] |
+|                                                                              |
+| Sugerencia de imagen: Muestra del Oficio Oficial de Autorización TecNM       |
+| (Folio M00/00697/2026) junto con la Circular 0045 y la carátula de la        |
+| macro-base de datos institucional.                                           |
+|                                                                              |
+| Pie de foto: Figura 1. Acervo normativo y documental oficial analizado       |
+| para el modelado funcional del módulo COMEXTRAS.                             |
++------------------------------------------------------------------------------+
+
+1.3 FLUJO INSTITUCIONAL (CICLO DE VIDA DE 4 ACTORES):
+1. Solicitante (Docente/Estudiante): Presenta solicitud, justificación e itinerario.
+2. Dirección del Plantel (IT): Verifica suficiencia presupuestal, pertinencia y
+   emite oficio formal dirigido a Oficinas Centrales.
+3. DVEIA / Secretaría de Extensión y Vinculación: Revisa congruencia técnica y
+   propone acuerdo de autorización.
+4. Dirección General del TecNM: Emite oficio resolutivo con folio institucional M00.
+5. Cierre y Comprobación Post-Comisión: Obligación reglamentaria de entregar
+   informe de actividades y evidencias fotográficas en plazo normativo.
+   * Semáforo de Auditoría: VIGENTE (en plazo) vs. VENCIDO (fuera de tiempo).
+
+1.4 ARQUITECTURA TÉCNICA DE BASE DE DATOS (POR QUÉ UN DATA MART DIMENSIONAL):
+ATLAS TECNM no es un sistema transaccional escolar (OLTP); es una plataforma
+analítica directiva (OLAP / Data Mart). Para calcular indicadores nacionales sin
+degradar el rendimiento con "JOINs" masivos, se implementó el Esquema Estrella
+(Ralph Kimball) sobre PostgreSQL 16 alojado en Neon Serverless:
+
+- TABLA DE HECHOS CENTRAL (rep_registros_base):
+  * Almacena métricas cuantitativas de docentes y estudiantes por género.
+  * Cálculo infalible por motor ("STORED GENERATED COLUMNS"):
+    total_docentes    = docentes_mujeres + docentes_hombres
+    total_estudiantes = estudiantes_mujeres + estudiantes_hombres
+    total_general     = total_docentes + total_estudiantes
+    (Garantiza cero error humano de fórmula y consultas en menos de 3 ms).
+  * Payload semiestructurado en columna "detalles_adicionales" tipo JSONB con
+    índice GIN para albergar datos propios de COMEXTRAS sin migraciones destructivas.
+
+- TABLAS DE DIMENSIONES MAESTRAS:
+  * cat_periodos:  Control de cortes trimestrales (Q1, Q2, Q3, Q4).
+  * cat_entidades: 32 entidades federativas con claves oficiales INEGI.
+  * cat_planteles: 263 institutos con sostenimiento Federal y Descentralizado.
+  * cat_submodulos: Catálogo institucional de los 35 submódulos en 4 Ejes.
+  * users: Control de auditoría y aislamiento Multi-Tenancy por plantel.
+
++------------------------------------------------------------------------------+
+| [INSERTAR CAPTURA DE PANTALLA 2: DIAGRAMA ENTIDAD-RELACIÓN ESQUEMA ESTRELLA] |
+|                                                                              |
+| Sugerencia de imagen: Diagrama ERD que ilustra la tabla de hechos central    |
+| (rep_registros_base) rodeada por las 4 dimensiones (Tiempo, Geográfica,      |
+| Planteles y Submódulos) en Neon PostgreSQL.                                  |
+|                                                                              |
+| Pie de foto: Figura 2. Modelo Dimensional en Estrella adaptado a la          |
+| estructura institucional del TecNM.                                          |
++------------------------------------------------------------------------------+
+
+1.5 MODELO RELACIONAL GRANULAR (PROPUESTA COM_SOLICITUDES):
+Para la fase de control y seguimiento de cada folio M00, se especificó la tabla
+transaccional "com_solicitudes" organizada en 7 grupos de datos:
+- Identificación: Folio solicitud IT, oficio de respuesta DG TecNM, corte trimestral.
+- Origen Institucional: Plantel ID (FK), sostenimiento (Federal / Descentralizado).
+- Comisionado: Nombre, CURP/RFC, género (H/M), tipo (Docente/Estudiante), nivel académico.
+- Destino y Evento: País, ciudad sede, institución anfitriona, tipo de participación.
+- Temporalidad: Fecha solicitud, fecha trámite, fecha inicio/fin, días de estancia.
+- Alineación Estratégica: Categoría de impacto nacional (Semiconductores, Olinia,
+  Salud, Agroindustria, Industrias Creativas, Formación Integral).
+- Financiamiento y Auditoría: Fuente de recursos, estatus, entrega de informe digital.
+
+1.6 CRITERIOS DE SELECCIÓN Y JUSTIFICACIÓN DE TIPOS DE DATOS:
+Cada tipo de dato fue seleccionado por rigor matemático y optimización en PostgreSQL:
+- BIGINT (64 bits): Rango amplio para IDs y llaves foráneas; previene desbordamiento
+  y optimiza uniones (JOINs) en servidores de 64 bits.
+- UNSIGNED INTEGER (32 bits, >= 0): Métricas de personas; protege la BD contra
+  valores negativos o decimales incongruentes (no existen 1.5 alumnos).
+- STORED GENERATED COLUMNS: Los totales se calculan físicamente en el motor SQL
+  al insertar/actualizar. Elimina errores humanos de fórmulas de Excel y ofrece
+  lecturas ultra rápidas (< 3 ms) sin consumir CPU al consultar.
+- JSONB + Índice GIN: Almacenamiento binario descompuesto para datos propios de cada
+  submódulo (ej. modalidades COMEXTRAS). Permite agregar atributos sin alterar la
+  estructura física ni requerir migraciones complejas.
+- DECIMAL(10, 7): Coordenadas geográficas con precisión milimétrica (evita los
+  errores de redondeo de FLOAT en los pines de Leaflet).
+- DATE vs. TIMESTAMP: DATE para calendarios sin desfase por husos horarios;
+  TIMESTAMP WITH TIME ZONE para auditoría de firma institucional y fiscalización.
+- ENUM: Restricción rígida a nivel motor para estados (BORRADOR, PUBLICADO)
+  ocupando solo 4 bytes en disco y rechazando valores no autorizados.
+- BOOLEAN (1 byte): Semántica binaria estricta (true/false) evitando convenciones
+  ambiguas heredadas de hojas de cálculo ('S'/'N', '1'/'0').
+
+================================================================================
+PUNTO 2: POSTURA SOBRE LA ELECCIÓN DEL LOGOTIPO INSTITUCIONAL
+================================================================================
+
+2.1 ASIGNACIÓN Y RESPONSABILIDAD:
+El proceso de diseño y propuesta conceptual del logotipo institucional de ATLAS
+corresponde al compañero/equipo designado para el área de identidad gráfica.
+
+2.2 INTEGRACIÓN Y RESPALDO TÉCNICO DE NUESTRA PARTE:
+Nuestra célula de trabajo ya implementó la base gráfica oficial en estricto apego
+al "Manual de Identidad Gráfica Oficial TecNM 2026":
+- Azul TecNM Primario:     HEX #1B396A  (RGB 27, 57, 106)
+- Guinda Institucional:     HEX #9B2247  (RGB 155, 34, 71)
+- Oro / Dorado de Acento:   HEX #A57F2C  (RGB 165, 127, 44)
+- Verde Éxito:              HEX #1E5B4F  (RGB 30, 91, 79)
+- Tipografía Oficial:       Familias Montserrat y Roboto
+
+2.3 ARQUITECTURA DESACOPLADA:
+El proveedor del panel en "AdminPanelProvider.php" cuenta con las directivas
+de marca desacopladas. En cuanto el equipo elija el logotipo definitivo, su
+montaje en Pantalla de Inicio de Sesión (Login), Barra Superior (Header),
+Barra Lateral (Sidebar) y Favicón se realizará en cuestión de minutos sin
+modificar la estructura del sistema.
+
++------------------------------------------------------------------------------+
+| [INSERTAR CAPTURA DE PANTALLA 3: INTERFAZ CON IDENTIDAD GRÁFICA TECNM 2026]  |
+|                                                                              |
+| Sugerencia de imagen: Pantalla de Login o barra de navegación superior de    |
+| ATLAS TECNM mostrando los colores oficiales (Azul #1B396A y Dorado #A57F2C)  |
+| con la tipografía institucional aplicada.                                    |
+|                                                                              |
+| Pie de foto: Figura 3. Integración de la paleta cromática oficial del        |
+| Manual de Identidad TecNM 2026 en la plataforma.                             |
++------------------------------------------------------------------------------+
+
+================================================================================
+PUNTO 3: ESTATUS DE LA MAQUETACIÓN Y PROTOTIPO FUNCIONAL VIVO
+================================================================================
+
+En lugar de presentar maquetas estáticas de dibujo, nuestro equipo pone a
+disposición de la Dirección General un SISTEMA VIVO, NAVEGABLE Y REACTIVO montado
+sobre Laravel 11 y Filament v3.
+
+3.1 TABLERO DIRECTIVO NACIONAL (NARRATIVA EN 3 BLOQUES):
+
+- BLOQUE 1: PULSO NACIONAL Y SEMÁFORO DE CUMPLIMIENTO
+  * Contador dinámico de días restantes para el cierre trimestral (Q3 2026).
+  * Semáforo en tiempo real de los 263 planteles del país:
+    - Verdes: Publicados y en regla.
+    - Dorados: En Borrador (captura iniciada).
+    - Guindas: En Rezago (sin reporte).
+  * Métricas consolidadas de participación docente vs. estudiantil y paridad de género.
+
++------------------------------------------------------------------------------+
+| [INSERTAR CAPTURA DE PANTALLA 4: TABLERO DIRECTIVO — BLOQUE 1 PULSO Y SEMÁFORO]|
+|                                                                              |
+| Sugerencia de imagen: Widget superior "Pulso Nacional" con la barra de       |
+| avance, días restantes de corte y badges de los 263 planteles en vivo.       |
+|                                                                              |
+| Pie de foto: Figura 4. Monitoreo en tiempo real del cumplimiento de reporte  |
+| institucional de los 263 planteles del TecNM.                                |
++------------------------------------------------------------------------------+
+
+- BLOQUE 2: CARTOGRAFÍA INTERACTIVA Y DESPLIEGUE TERRITORIAL (MAPAREPUBLICAWIDGET)
+  * Renderizado cartográfico real sobre Leaflet.js con capa base ESRI ArcGIS Dark Canvas.
+  * Mapeo coropléjico de las 32 entidades federativas con claves oficiales INEGI.
+  * Filtros cruzados inmediatos:
+    - Por Submódulo: Todos, 2.2 MTE y 3.1 COMEXTRAS.
+    - Por Sostenimiento: Comparativa Federal vs. Descentralizado.
+  * Tooltip interactivo al cursor y panel lateral con listado de tecnológicos
+    y semáforo estatal de participación.
+
++------------------------------------------------------------------------------+
+| [INSERTAR CAPTURA DE PANTALLA 5: MAPA INTERACTIVO DE LA REPÚBLICA MEXICANA]  |
+|                                                                              |
+| Sugerencia de imagen: Vista completa del mapa de México con escala de calor  |
+| en Azul TecNM, filtros activos de COMEXTRAS y panel lateral desplegado.      |
+|                                                                              |
+| Pie de foto: Figura 5. Despliegue territorial con Leaflet.js, capa base      |
+| ESRI ArcGIS y semáforo de cumplimiento por entidad federativa.               |
++------------------------------------------------------------------------------+
+
+- BLOQUE 3: INCLUSIÓN, PARIDAD DE GÉNERO Y SECTORES ESTRATÉGICOS
+  * Diagnóstico de paridad de género estudiantil (% Mujeres vs. % Hombres).
+  * Diagnóstico de paridad de género docente y medición de brecha.
+  * Distribución porcentual en sectores estratégicos de desarrollo nacional
+    (Semiconductores, Electromovilidad/Olinia, Salud, Agroindustria) y disciplinas
+    COMEXTRAS (Movilidad Internacional, Arte y Cultura, Deporte, Formación Cívica).
+
++------------------------------------------------------------------------------+
+| [INSERTAR CAPTURA DE PANTALLA 6: ANALÍTICA DE GÉNERO Y SECTORES ESTRATÉGICOS]|
+|                                                                              |
+| Sugerencia de imagen: Bloque 3 con barras de progreso bicolores institucionales|
+| mostrando paridad estudiantil/docente y clasificación de proyectos.          |
+|                                                                              |
+| Pie de foto: Figura 6. Tablero analítico de paridad de género y alineación a |
+| sectores estratégicos nacionales.                                            |
++------------------------------------------------------------------------------+
+
+3.2 RECURSO DE GESTIÓN Y CAPTURA COMEXTRAS (COMEXTRASRESOURCE):
+- Formulario de Captura Reactivo:
+  * Selectores de Periodo, Plantel e Instituto con protección Multi-Tenancy.
+  * Validación de género en vivo: calcula subtotales de docentes, estudiantes
+    y total general de participantes en tiempo real sin recargar la página.
+  * Sección de modalidades: Movilidad Internacional, Deportiva, Cultural, Cívica.
+  * Carga estructurada de archivos probatorios (oficios en PDF y Excel hasta 10 MB).
+- Tabla Administrativa de Gestión:
+  * Listado consolidado con badges de estatus (Borrador vs. Publicado).
+  * Filtros por periodo y búsqueda instantánea por nombre de instituto.
+
++------------------------------------------------------------------------------+
+| [INSERTAR CAPTURA DE PANTALLA 7: MÓDULO DE CAPTURA COMEXTRAS (FORMULARIO)]   |
+|                                                                              |
+| Sugerencia de imagen: Formulario de captura del recurso 3.1 COMEXTRAS con el |
+| cálculo reactivo de participantes por género y sección de evidencias.        |
+|                                                                              |
+| Pie de foto: Figura 7. Pantalla de captura y validación del recurso 3.1      |
+| COMEXTRAS implementado en Filament PHP v3.                                  |
++------------------------------------------------------------------------------+
+
+3.3 ARQUITECTURA MODULAR DE NAVEGACIÓN POR CLUSTERS:
+La barra de navegación de ATLAS ya refleja la estructura oficial de 4 Ejes:
+- Cluster 1: Vinculación Estratégica
+- Cluster 2: Innovación y Emprendimiento
+- Cluster 3: Intercambio Académico (Hospeda operativamente a 3.1 COMEXTRAS)
+- Cluster 4: Extensión
+
+================================================================================
+GUIÓN DE INTERVENCIÓN (PITCH DE IMPACTO PARA LA REUNIÓN)
+================================================================================
+
+PUNTO 1: ANÁLISIS Y BD
+"Buenos días. En la célula de COMEXTRAS cubrimos el análisis normativo integral:
+la Circular 0045, el Manual de Procedimientos, los formatos de docentes y
+estudiantes, y la macro-base de Excel de 22 megabytes.
+El flujo de 4 actores (comisionado, plantel, DVEIA y Dirección General) está
+plenamente modelado.
+En la base de datos implementamos un Data Mart dimensional con Esquema Estrella en
+PostgreSQL que elimina fórmulas de Excel corruptibles gracias a columnas STORED
+calculadas por el propio motor, y dejamos lista la especificación granular de
+com_solicitudes para el seguimiento de cada folio M00."
+
+PUNTO 2: LOGOTIPO
+"Entendemos que el logotipo lo presenta el equipo asignado a diseño gráfico.
+Queremos informar que la plataforma ya fue desarrollada siguiendo estrictamente
+el Manual de Identidad Gráfica Oficial TecNM 2026: Azul TecNM, Guinda, Oro y fuentes
+institucionales. El panel está desacoplado, por lo que tan pronto se apruebe el logo,
+se incorporará de inmediato en toda la aplicación."
+
+PUNTO 3: MAQUETACIÓN
+"Para la maquetación, queremos presentarles una plataforma funcional y navegable.
+Tenemos activo el Dashboard Directivo Nacional con semáforo de cumplimiento en vivo
+de los 263 institutos, mapa interactivo de México con Leaflet y ESRI Canvas,
+analítica de género, y el módulo de captura de COMEXTRAS operando con cálculo
+reactivo en tiempo real. Estamos listos para proyectarlo."
+
+================================================================================
+FIN DEL DOSSIER EJECUTIVO — PROYECTO ATLAS TECNM 2026
+================================================================================

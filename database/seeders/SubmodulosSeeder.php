@@ -24,7 +24,7 @@ class SubmodulosSeeder extends Seeder
 
             // EJE 2: INNOVACIÓN Y EMPRENDIMIENTO
             ['eje_id' => $ejeIds['EJE-02'], 'clave' => '2.1', 'nombre' => 'Eventos de Innovación y Emprendimiento (InnovaTecNM)', 'activo_mvp' => false],
-            ['eje_id' => $ejeIds['EJE-02'], 'clave' => '2.2', 'nombre' => 'Modelo Talento Emprendedor (MTE)', 'activo_mvp' => true], // ⭐ MVP
+            ['eje_id' => $ejeIds['EJE-02'], 'clave' => '2.2', 'nombre' => 'Modelo Talento Emprendedor (MTE)', 'activo_mvp' => true], // MVP
             ['eje_id' => $ejeIds['EJE-02'], 'clave' => '2.3', 'nombre' => 'Nodos de Impulso a la Economía Social y Solidaria (NODESS)', 'activo_mvp' => false],
             ['eje_id' => $ejeIds['EJE-02'], 'clave' => '2.4', 'nombre' => 'Centros de Innovación e Impulso Empresarial y Social', 'activo_mvp' => false],
             ['eje_id' => $ejeIds['EJE-02'], 'clave' => '2.5', 'nombre' => 'Educación Financiera', 'activo_mvp' => false],
@@ -33,7 +33,7 @@ class SubmodulosSeeder extends Seeder
             ['eje_id' => $ejeIds['EJE-02'], 'clave' => '2.8', 'nombre' => 'Centros de Patentamiento', 'activo_mvp' => false],
 
             // EJE 3: INTERCAMBIO ACADÉMICO
-            ['eje_id' => $ejeIds['EJE-03'], 'clave' => '3.1', 'nombre' => 'Movilidad Nacional e Internacional (COMEXTRAS)', 'activo_mvp' => true], // ⭐ MVP
+            ['eje_id' => $ejeIds['EJE-03'], 'clave' => '3.1', 'nombre' => 'Movilidad Nacional e Internacional (COMEXTRAS)', 'activo_mvp' => true], // MVP
             ['eje_id' => $ejeIds['EJE-03'], 'clave' => '3.2', 'nombre' => 'Servicio Social y Desarrollo Comunitario', 'activo_mvp' => false],
             ['eje_id' => $ejeIds['EJE-03'], 'clave' => '3.3', 'nombre' => 'AlfabetizaTec', 'activo_mvp' => false],
             ['eje_id' => $ejeIds['EJE-03'], 'clave' => '3.4', 'nombre' => 'Residencias Profesionales', 'activo_mvp' => false],

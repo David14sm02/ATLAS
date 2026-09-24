@@ -1,0 +1,195 @@
+/* ==========================================================================
+   ATLAS TecNM - Estilos Globales de Tema (Modo Claro y Modo Oscuro)
+   ========================================================================== */
+
+/* Banner Institucional TecNM (Asegura legibilidad 100% en Claro y Oscuro) */
+.tecnm-banner {
+    background: linear-gradient(135deg, #1B396A 0%, #162e54 50%, #1B396A 100%) !important;
+    border-bottom: 4px solid #A57F2C !important;
+    color: #FFFFFF !important;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 25px -5px rgba(27, 57, 106, 0.35), 0 8px 10px -6px rgba(27, 57, 106, 0.2);
+}
+
+.tecnm-banner h2,
+.tecnm-banner h3,
+.tecnm-banner strong {
+    color: #FFFFFF !important;
+}
+
+.tecnm-banner .tecnm-pill-gold {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid rgba(245, 158, 11, 0.45) !important;
+    color: #FCD34D !important;
+}
+
+.tecnm-banner .tecnm-pill-dark {
+    background-color: rgba(0, 0, 0, 0.28) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #DBEAFE !important;
+}
+
+.tecnm-banner .tecnm-stat-box {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(8px);
+}
+
+/* ==========================================================================
+   Contenedor Leaflet y Mapas Geográficos
+   ========================================================================== */
+
+/* Modo Oscuro para Leaflet */
+html.dark .leaflet-container {
+    background-color: #0b1329 !important;
+    font-family: inherit !important;
+}
+
+/* Modo Claro para Leaflet */
+html:not(.dark) .leaflet-container {
+    background-color: #E2E8F0 !important;
+    font-family: inherit !important;
+}
+
+/* Tooltip Institucional TecNM para el mapa */
+.tecnm-leaflet-tooltip {
+    background: rgba(27, 57, 106, 0.96) !important;
+    border: 1.5px solid #A57F2C !important;
+    color: #FFFFFF !important;
+    font-family: 'Noto Sans', sans-serif !important;
+    border-radius: 10px !important;
+    padding: 8px 12px !important;
+    box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.6) !important;
+}
+
+.tecnm-leaflet-tooltip::before {
+    border-top-color: #A57F2C !important;
+}
+
+/* ==========================================================================
+   Acentos Institucionales TecNM (Adaptativos a Claro y Oscuro)
+   ========================================================================== */
+
+/* Azul Institucional TecNM (#1B396A) */
+.text-tecnm-blue {
+    color: #1B396A !important;
+}
+html.dark .text-tecnm-blue {
+    color: #60A5FA !important;
+}
+
+.bg-tecnm-blue {
+    background-color: #1B396A !important;
+}
+html.dark .bg-tecnm-blue {
+    background-color: #2563EB !important;
+}
+
+/* Dorado Institucional TecNM (#A57F2C) */
+.text-tecnm-gold {
+    color: #8C6A1E !important;
+}
+html.dark .text-tecnm-gold {
+    color: #FBBF24 !important;
+}
+
+.bg-tecnm-gold {
+    background-color: #A57F2C !important;
+}
+
+/* Verde Oficial (#1E5B4F) */
+.text-tecnm-green {
+    color: #1E5B4F !important;
+}
+html.dark .text-tecnm-green {
+    color: #34D399 !important;
+}
+
+.bg-tecnm-green {
+    background-color: #1E5B4F !important;
+}
+
+/* Guinda Institucional (#9B2247) */
+.text-tecnm-guinda {
+    color: #9B2247 !important;
+}
+html.dark .text-tecnm-guinda {
+    color: #F87171 !important;
+}
+
+.bg-tecnm-guinda {
+    background-color: #9B2247 !important;
+}
+
+/* Topbar Theme Switcher styling */
+.fi-topbar-theme-switcher {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 4px;
+    border-radius: 9999px;
+    background-color: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+html.dark .fi-topbar-theme-switcher {
+    background-color: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* ==========================================================================
+   Barra Ejecutiva Cockpit (Garantiza 4 columnas horizontales)
+   ========================================================================== */
+.atlas-cockpit-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+}
+
+@media (max-width: 1100px) {
+    .atlas-cockpit-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .atlas-cockpit-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+.atlas-cockpit-card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 0.875rem !important;
+    padding: 0.75rem 1rem !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    min-height: 84px !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+html.dark .atlas-cockpit-card {
+    background: #0f172a !important;
+    border-color: #1e293b !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3) !important;
+}
+
+.atlas-cockpit-card:hover {
+    border-color: #1B396A !important;
+}
+
+html.dark .atlas-cockpit-card:hover {
+    border-color: #3b82f6 !important;
+}
+
+.atlas-semaforo-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 0.375rem !important;
+    width: 100% !important;
+    align-items: center !important;
+}
+

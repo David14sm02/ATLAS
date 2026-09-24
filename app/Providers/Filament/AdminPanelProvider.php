@@ -2,6 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\InclusionSectoresWidget;
+use App\Filament\Widgets\MapaRepublicaWidget;
+use App\Filament\Widgets\PulsoNacionalWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -11,7 +14,6 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\View\PanelsRenderHook;
-use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -41,6 +43,17 @@ class AdminPanelProvider extends PanelProvider
                 'danger' => Color::hex('#9B2247'),  // Guinda institucional (Pantone 7420 C)
                 'info' => Color::hex('#1B396A'),
             ])
+            ->darkMode(true)
+            // Inyectar estilos institucionales y librerías cartográficas Leaflet
+            ->renderHook(
+                PanelsRenderHook::HEAD_END,
+                fn (): HtmlString => new HtmlString('
+                    <link rel="stylesheet" href="'.asset('css/atlas-theme.css').'" />
+                    <link rel="stylesheet" href="'.asset('js/leaflet/leaflet.css').'" />
+                    <script src="'.asset('js/leaflet/leaflet.js').'"></script>
+                    <script src="'.asset('js/echarts.min.js').'"></script>
+                ')
+            )
             // Inyectar el Lema Institucional en el pie del panel
             ->renderHook(
                 PanelsRenderHook::FOOTER,
@@ -58,8 +71,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                PulsoNacionalWidget::class,
+                MapaRepublicaWidget::class,
+                InclusionSectoresWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
