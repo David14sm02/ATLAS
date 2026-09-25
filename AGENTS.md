@@ -39,6 +39,15 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 ## Documentation Files
 
 - You must only create documentation files if explicitly requested by the user.
+- All documentation files (.md, .txt, etc.) MUST be strictly organized within categorized subdirectories inside `docs/`. Never place loose documentation files in the root of `docs/` or the project root.
+- Follow the modular taxonomy established in `.agents/rules/documentation_organization.md`:
+  * `docs/ejecutivos/`: Executive summaries, final status reports, and project roadmaps.
+  * `docs/base_datos/`: Dimensional modeling, schemas, ERDs, and data mart technical justifications.
+  * `docs/tecnica/`: Developer onboarding, local environment setups, and UI/UX design specifications.
+  * `docs/modulos/<codigo>_<nombre>/`: Dedicated module documentation (e.g., `docs/modulos/3.1_comextras/`). Module source files belong in `formatos_origen/`.
+  * `docs/analisis/`: Functional specifications and requirement analysis.
+  * `docs/identidad/`: Branding manuals and official graphic assets.
+- If a new document represents a new topic or module without an existing folder, create a dedicated subdirectory with snake_case naming (avoid spaces) and update `docs/README.md`.
 
 ## Replies
 

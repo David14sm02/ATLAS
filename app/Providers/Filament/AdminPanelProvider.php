@@ -13,6 +13,7 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\MaxWidth;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -32,6 +33,8 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName('ATLAS TecNM')
+            ->topNavigation()
+            ->maxContentWidth(MaxWidth::Full)
             // Tipografía oficial Noto Sans (Manual de Identidad Gráfica TecNM Pág. 10)
             ->font('Noto Sans')
             // Paleta oficial TecNM y Gobierno de México (MIG Págs. 9 y 15)
