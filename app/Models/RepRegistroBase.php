@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\BelongsToPlantel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class RepRegistroBase extends Model
 {
-    use HasFactory, SoftDeletes;
+    use BelongsToPlantel, HasFactory, SoftDeletes;
 
     protected $table = 'rep_registros_base';
 
@@ -44,14 +45,6 @@ class RepRegistroBase extends Model
             'total_general' => 'integer',
             'published_at' => 'datetime',
         ];
-    }
-
-    /**
-     * Plantel que emitió el reporte (Multi-Tenancy).
-     */
-    public function plantel(): BelongsTo
-    {
-        return $this->belongsTo(CatPlantel::class, 'plantel_id');
     }
 
     /**
@@ -100,10 +93,5 @@ class RepRegistroBase extends Model
     public function scopeDeSubmodulo(Builder $query, string $clave): Builder
     {
         return $query->whereHas('submodulo', fn (Builder $q) => $q->where('clave', $clave));
-    }
-
-    public function scopeParaPlantel(Builder $query, int $plantelId): Builder
-    {
-        return $query->where('plantel_id', $plantelId);
     }
 }

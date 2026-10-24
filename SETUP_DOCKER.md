@@ -71,3 +71,10 @@ A partir de ahora, todas las interacciones con Artisan, NPM o Composer debes hac
 - **Ejecutar comandos Artisan:** `./vendor/bin/sail artisan <comando>`
 - **Instalar paquetes NPM:** `./vendor/bin/sail npm install`
 - **Compilar assets en desarrollo:** `./vendor/bin/sail npm run dev`
+- **Reconstruir contenedor con parches de seguridad (PHP2Shell / CVEs):**
+  ```bash
+  ./vendor/bin/sail build --no-cache
+  # O directamente vía Docker:
+  docker compose build --no-cache laravel.test
+  ```
+
