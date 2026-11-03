@@ -25,6 +25,7 @@ docs/
 
 ### 1. Documentos Ejecutivos (`docs/ejecutivos/`)
 * **[DOCUMENTO_FINAL_PROYECTO_ATLAS_TECNM.txt](ejecutivos/DOCUMENTO_FINAL_PROYECTO_ATLAS_TECNM.txt):** Resumen ejecutivo integral del proyecto, justificación, logros alcanzados y proyección/roadmap (formato optimizado para exportar a PDF).
+* **[speech_presentacion_base_datos.md](ejecutivos/speech_presentacion_base_datos.md):** Guion ejecutivo, storyboard visual de diapositivas, diagrama E/R renderizado en Mermaid y defensa técnica de la base de datos (Data Mart en Esquema Estrella).
 * **[bitacora_avances.md](ejecutivos/bitacora_avances.md):** Bitácora oficial de avances de ingeniería y registro de hitos del Hito 0 al Hito 5.
 
 ### 2. Base de Datos y Persistencia (`docs/base_datos/`)
