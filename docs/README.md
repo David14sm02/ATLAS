@@ -25,7 +25,8 @@ docs/
 
 ### 1. Documentos Ejecutivos (`docs/ejecutivos/`)
 * **[DOCUMENTO_FINAL_PROYECTO_ATLAS_TECNM.txt](ejecutivos/DOCUMENTO_FINAL_PROYECTO_ATLAS_TECNM.txt):** Resumen ejecutivo integral del proyecto, justificación, logros alcanzados y proyección/roadmap (formato optimizado para exportar a PDF).
-* **[bitacora_avances.md](ejecutivos/bitacora_avances.md):** Bitácora oficial de avances de ingeniería y registro de hitos del Hito 0 al Hito 5.
+* **[bitacora_avances.md](ejecutivos/bitacora_avances.md):** Bitácora oficial de avances de ingeniería y registro de hitos del Hito 0 al Hito 6.
+* **[reporte_roles_v2_1_planteles_y_auditoria_forense.md](ejecutivos/reporte_roles_v2_1_planteles_y_auditoria_forense.md):** Documento maestro de la jornada del 02/Nov/2026: integración del servidor MCP, catálogo oficial de los 266 planteles y centros del TecNM, matriz de roles v2.1 (`R1`–`R6`), directorio de los 13 usuarios de prueba para Frontend y arquitectura de la Caja Negra de Auditoría Forense inmutable.
 
 ### 2. Base de Datos y Persistencia (`docs/base_datos/`)
 * **[arquitectura_bd.md](base_datos/arquitectura_bd.md):** Especificación técnica del Esquema Estrella en PostgreSQL (Neon Serverless), tabla de hechos central y dimensiones.

@@ -33,7 +33,7 @@ return new class extends Migration
             $table->unsignedInteger('total_general')->storedAs('docentes_mujeres + docentes_hombres + estudiantes_mujeres + estudiantes_hombres');
 
             // Payload Semiestructurado para atributos particulares de cada submódulo
-            $table->json('detalles_adicionales')->nullable();
+            $table->jsonb('detalles_adicionales')->nullable();
 
             // Soportes del Mundo Real: Evidencias, Notas y Auditoría
             $table->string('archivo_evidencia')->nullable();

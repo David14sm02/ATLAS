@@ -17,6 +17,7 @@
 | **Hito 3** | 22/Sep/2026 | 4 Clusters, Modelos Eloquent, Recursos MVP e Identidad TecNM Oficial | **COMPLETADO** |
 | **Hito 4** | Pendiente | Ingesta asíncrona de archivos Excel con validación en segundo plano (*dry-run*) | *PENDIENTE (Por acordar con el equipo)* |
 | **Hito 5** | 23/Sep/2026 | Tablero Directivo Nacional (Propuesta C - Storytelling UX en 3 Bloques) | **COMPLETADO** |
+| **Hito 6** | 02/Nov/2026 | Roles v2.1 (R1–R6), Catálogo Oficial de 266 Planteles, Bitácora Forense Inmutable y Oráculo MCP | **COMPLETADO** |
 
 ---
 
@@ -97,6 +98,20 @@
    * Registro activo en `app/Providers/Filament/AdminPanelProvider.php`.
 
 * **Estatus del Hito 5:** **CONCLUIDO EXITOSAMENTE**. Tablero Directivo Nacional 100% operativo con la narrativa ejecutiva de los 3 bloques.
+
+---
+
+### [Hito 6] - Arquitectura de Roles v2.1, Catálogo de 266 Planteles, Bitácora Forense Inmutable y Servidor MCP
+* **Fecha:** 02 de Noviembre de 2026
+* **Responsable:** Fábrica de Software
+* **Objetivo:** Implementar la segregación Multi-Tenant por jerarquía institucional (`R1` a `R6`), poblar el catálogo oficial completo de los **266 Institutos y Centros del TecNM**, habilitar los 13 usuarios semilla para el equipo de Frontend, construir el sistema de monitoreo interno de solo lectura ("Caja Negra" de auditoría) e integrar el servidor `atlas-knowledge-mcp`.
+* **Entregables Principales:**
+  1. **Servidor MCP (`atlas-knowledge-mcp` v2.1.0):** Instalado en `.agents/mcp/atlas-knowledge/` con 6 tarjetas atómicas y 303 fragmentos indexados en SQLite FTS5.
+  2. **Catálogo Maestro de 266 Planteles (`PlantelesSeeder.php`):** Extracción directa desde `BASE COMEXTRAS 2026.xlsm` (`126` Federales, `134` Descentralizados OPD y `6` Centros Especializados: `CRODE`, `CIIDET`, `CENIDET`).
+  3. **Sistema de Roles v2.1 y Matriz `user_submodulos`:** Migraciones `2026_10_01_100001` a `100004`, actualización de `User.php` y creación de `UsersRolesSeeder.php` con 13 perfiles de prueba para Frontend.
+  4. **Caja Negra de Auditoría Forense (`rep_dictamenes_log`):** Modelo inmutable `RepDictamenLog`, observador automático `RegistraBitacoraForense` (registra altas, cambios antes/después, publicaciones, firmas delegadas, cargas Excel y eliminaciones) y recurso de solo lectura estricta `BitacoraAuditoriaResource`.
+  5. **Documentación Ejecutiva:** `docs/ejecutivos/reporte_roles_v2_1_planteles_y_auditoria_forense.md`.
+* **Estatus del Hito 6:** **CONCLUIDO EXITOSAMENTE**.
 
 ---
 *(Siguiente hito del roadmap: Retomar Hito 4 - Ingesta Asíncrona de Excel F.37 / F.32 tras validación de plantillas con el equipo).*

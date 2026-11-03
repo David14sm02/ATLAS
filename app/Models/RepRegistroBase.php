@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RegistraBitacoraForense;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class RepRegistroBase extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, RegistraBitacoraForense, SoftDeletes;
 
     protected $table = 'rep_registros_base';
 

@@ -4,13 +4,19 @@ namespace Tests\Feature;
 
 use App\Filament\Clusters\InnovacionEmprendimiento\Resources\MteResource;
 use App\Filament\Clusters\IntercambioAcademico\Resources\ComextrasResource;
+use App\Filament\Resources\BitacoraAuditoriaResource;
 use App\Filament\Widgets\MapaRepublicaWidget;
 use App\Filament\Widgets\PulsoNacionalWidget;
 use App\Filament\Widgets\PulsoPlantelWidget;
+use App\Models\CatPeriodo;
 use App\Models\CatPlantel;
+use App\Models\CatSubmodulo;
+use App\Models\RepDictamenLog;
+use App\Models\RepRegistroBase;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use LogicException;
 use Tests\TestCase;
 
 class RolesV21AndPlantelesCatalogTest extends TestCase
@@ -79,6 +85,53 @@ class RolesV21AndPlantelesCatalogTest extends TestCase
         $this->assertTrue(PulsoPlantelWidget::canView());
         $this->assertTrue(ComextrasResource::canViewAny());
         $this->assertFalse(MteResource::canViewAny());
+        $this->assertFalse(BitacoraAuditoriaResource::canViewAny());
+
+        // 5. Verificar Bitácora Inmutable (Caja Negra) y aislamiento entre planteles
+        $submodulo31 = CatSubmodulo::where('clave', '3.1')->firstOrFail();
+        $periodo = CatPeriodo::firstOrFail();
+
+        $reporteSaltillo = RepRegistroBase::create([
+            'plantel_id' => $enlaceComextras->plantel_id,
+            'submodulo_id' => $submodulo31->id,
+            'periodo_id' => $periodo->id,
+            'user_id' => $enlaceComextras->id,
+            'estado' => 'BORRADOR',
+            'docentes_mujeres' => 3,
+            'docentes_hombres' => 4,
+            'estudiantes_mujeres' => 10,
+            'estudiantes_hombres' => 12,
+        ]);
+
+        // Cuando el Subdirector firma/publica por ausencia, debe quedar registrado FIRMA_DELEGADA
+        $subdirectorSaltillo = User::where('email', 'subdirector@saltillo.tecnm.mx')->firstOrFail();
+        $this->actingAs($subdirectorSaltillo);
+        $reporteSaltillo->update([
+            'docentes_mujeres' => 5,
+            'estado' => 'PUBLICADO',
+        ]);
+
+        $logsSaltillo = RepDictamenLog::where('plantel_id', $enlaceComextras->plantel_id)->get();
+        $this->assertCount(2, $logsSaltillo);
+        $this->assertSame('CREACION', $logsSaltillo[0]->accion);
+        $this->assertSame('FIRMA_DELEGADA', $logsSaltillo[1]->accion);
+        $this->assertSame(3, $logsSaltillo[1]->valores_anteriores['docentes_mujeres']);
+        $this->assertSame(5, $logsSaltillo[1]->valores_nuevos['docentes_mujeres']);
+
+        // El Director de Irapuato NO puede ver los logs de Saltillo
+        $directorIrapuato = User::where('email', 'director@irapuato.tecnm.mx')->firstOrFail();
+        $this->assertSame(0, RepDictamenLog::visibleParaUsuario($directorIrapuato)->count());
+        // El Director de Saltillo y el OIC Nacional SÍ ven los 2 movimientos de Saltillo
+        $this->assertSame(2, RepDictamenLog::visibleParaUsuario($directorSaltillo)->count());
+        $this->assertSame(2, RepDictamenLog::visibleParaUsuario($oic)->count());
+
+        // Nadie puede editar ni borrar registros de la bitácora
+        $this->assertFalse(BitacoraAuditoriaResource::canCreate());
+        $this->assertFalse(BitacoraAuditoriaResource::canEdit($logsSaltillo[0]));
+        $this->assertFalse(BitacoraAuditoriaResource::canDelete($logsSaltillo[0]));
+
+        $this->expectException(LogicException::class);
+        $logsSaltillo[0]->delete();
     }
 }
 
