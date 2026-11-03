@@ -16,6 +16,13 @@ class MapaRepublicaWidget extends Widget
 
     protected int|string|array $columnSpan = 'full';
 
+    public static function canView(): bool
+    {
+        $user = auth()->user();
+
+        return $user ? ($user->esNacional() || $user->esSupervisorTerritorial()) : false;
+    }
+
     public ?string $submoduloFiltro = 'todos';
 
     public ?string $sostenimientoFiltro = 'todos';

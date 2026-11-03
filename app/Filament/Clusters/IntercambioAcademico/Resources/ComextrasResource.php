@@ -33,6 +33,23 @@ class ComextrasResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    public static function canViewAny(): bool
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return false;
+        }
+
+        return $user->puedeCapturarSubmodulo('3.1');
+    }
+
+    public static function canCreate(): bool
+    {
+        $user = Auth::user();
+
+        return $user ? ! $user->esSoloLectura() : false;
+    }
+
     public static function getEloquentQuery(): Builder
     {
         $submodulo = CatSubmodulo::where('clave', '3.1')->first();
@@ -40,10 +57,16 @@ class ComextrasResource extends Resource
         $query = parent::getEloquentQuery()
             ->where('submodulo_id', $submodulo?->id ?? 0);
 
-        // Aislamiento Multi-Tenancy
+        // Aislamiento Multi-Tenancy por Rol (Plantel o Supervisión Estatal OPD)
         $user = Auth::user();
-        if ($user && ! $user->esNacional() && $user->plantel_id) {
-            $query->where('plantel_id', $user->plantel_id);
+        if ($user && ! $user->esNacional()) {
+            if ($user->esSupervisorTerritorial() && $user->entidad_id) {
+                $query->whereHas('plantel', fn (Builder $q) => $q
+                    ->where('entidad_id', $user->entidad_id)
+                    ->where('sostenimiento', 'DESCENTRALIZADO'));
+            } elseif ($user->plantel_id) {
+                $query->where('plantel_id', $user->plantel_id);
+            }
         }
 
         return $query;

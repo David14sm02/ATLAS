@@ -26,3 +26,7 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 docker-compose.override.yml
+/.agents/mcp/atlas-knowledge/atlas_knowledge.db
+/.agents/mcp/atlas-knowledge/service_account.json
+/.agents/mcp/atlas-knowledge/gdrive_oauth_token.json
+/.agents/mcp/atlas-knowledge/__pycache__/

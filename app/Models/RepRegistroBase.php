@@ -20,6 +20,7 @@ class RepRegistroBase extends Model
         'periodo_id',
         'user_id',
         'estado',
+        'lock_version',
         'docentes_mujeres',
         'docentes_hombres',
         'estudiantes_mujeres',
@@ -35,6 +36,7 @@ class RepRegistroBase extends Model
     {
         return [
             'detalles_adicionales' => 'array',
+            'lock_version' => 'integer',
             'docentes_mujeres' => 'integer',
             'docentes_hombres' => 'integer',
             'estudiantes_mujeres' => 'integer',

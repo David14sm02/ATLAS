@@ -1,0 +1,16 @@
+services:
+  mcp-atlas:
+    build: .
+    container_name: mcp-atlas-tecnm
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - ATLAS_DB_PATH=/app/data/atlas_knowledge.db
+      - GDRIVE_SERVICE_ACCOUNT=/app/data/service_account.json
+    volumes:
+      - mcp_data:/app/data
+
+volumes:
+  mcp_data:

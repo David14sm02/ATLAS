@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Filament\Widgets\InclusionSectoresWidget;
 use App\Filament\Widgets\MapaRepublicaWidget;
 use App\Filament\Widgets\PulsoNacionalWidget;
+use App\Filament\Widgets\PulsoPlantelWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -75,6 +76,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 PulsoNacionalWidget::class,
+                PulsoPlantelWidget::class,
                 MapaRepublicaWidget::class,
                 InclusionSectoresWidget::class,
             ])

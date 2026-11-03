@@ -15,10 +15,15 @@ class CatPlantel extends Model
 
     protected $fillable = [
         'entidad_id',
+        'region',
         'clave_tecnm',
+        'siglas',
         'nombre',
         'municipio',
         'sostenimiento',
+        'tipo_institucion',
+        'director_nombre',
+        'director_cargo',
         'latitud',
         'longitud',
         'activo',
@@ -27,6 +32,7 @@ class CatPlantel extends Model
     protected function casts(): array
     {
         return [
+            'region' => 'integer',
             'activo' => 'boolean',
             'latitud' => 'decimal:7',
             'longitud' => 'decimal:7',

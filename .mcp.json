@@ -6,6 +6,20 @@
                 "artisan",
                 "boost:mcp"
             ]
+        },
+        "atlas-knowledge": {
+            "command": "python",
+            "args": [
+                "d:\\data\\ATLAS TECM\\.agents\\mcp\\atlas-knowledge\\server.py"
+            ],
+            "env": {
+                "ATLAS_DB_PATH": "d:\\data\\ATLAS TECM\\.agents\\mcp\\atlas-knowledge\\atlas_knowledge.db",
+                "ATLAS_REPO_DIR": "d:\\data\\ATLAS TECM",
+                "ATLAS_DOCS_DIR": "d:\\data\\ATLAS TECM\\docs",
+                "ATLAS_EXCEL_COMEXTRA": "d:\\data\\ATLAS TECM\\docs\\modulos\\3.1_comextras\\formatos_origen\\BASE COMEXTRAS 2026.xlsm",
+                "ATLAS_AUTO_SYNC": "true",
+                "ATLAS_AUTO_SYNC_INTERVAL": "300"
+            }
         }
     }
 }

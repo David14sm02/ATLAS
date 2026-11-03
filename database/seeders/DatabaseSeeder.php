@@ -13,6 +13,8 @@ class DatabaseSeeder extends Seeder
             SubmodulosSeeder::class,
             EntidadesSeeder::class,
             PeriodosSeeder::class,
+            PlantelesSeeder::class,
+            UsersRolesSeeder::class,
         ]);
     }
 }

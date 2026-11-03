@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# Environment & Credentials (Zero-Leak Security)
+.env
+service_account.json
+credentials.json
+client_secret.json
+gdrive_oauth_token.json
+*.pem
+*.key
+
+# SQLite Databases & Logs
+*.log
+*.db
+atlas_knowledge.db
+data/
+
+# OS specific
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

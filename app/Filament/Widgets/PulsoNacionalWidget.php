@@ -16,6 +16,13 @@ class PulsoNacionalWidget extends Widget
 
     protected int|string|array $columnSpan = 'full';
 
+    public static function canView(): bool
+    {
+        $user = auth()->user();
+
+        return $user ? ($user->esNacional() || $user->esSupervisorTerritorial()) : false;
+    }
+
     public function getViewData(): array
     {
         // 1. Periodo Trimestral Activo

@@ -1,0 +1,53 @@
+name: Build Windows EXE
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install PyInstaller
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+
+    - name: Build Standalone EXE
+      run: |
+        pyinstaller --onefile --console --name "AtlasMCP-Setup" install.py
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: AtlasMCP-Setup-Windows-EXE
+        path: dist/AtlasMCP-Setup.exe
+
+    - name: Create GitHub Release with EXE
+      uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/heads/main')
+      with:
+        tag_name: v1.0.0
+        name: "Release v1.0.0 - Instalador Standalone Windows (.exe)"
+        body: |
+          ## 🚀 Instalador Standalone para Windows (.exe)
+          Descarga `AtlasMCP-Setup.exe` y ejecútalo con doble clic para configurar automáticamente tu editor (Cursor, VS Code, Claude, etc.).
+          - No requiere conocimientos técnicos de Python.
+          - Menús interactivos en consola.
+          - Configuración automática de rutas y archivos de configuración.
+        files: dist/AtlasMCP-Setup.exe
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

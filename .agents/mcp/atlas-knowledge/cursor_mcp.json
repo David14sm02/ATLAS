@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "atlas-knowledge": {
+      "command": "python3",
+      "args": [
+        "/data/data/com.termux/files/home/tools/atlas_mcp/server.py"
+      ],
+      "env": {
+        "ATLAS_DB_PATH": "/data/data/com.termux/files/home/tools/atlas_mcp/atlas_knowledge.db"
+      }
+    }
+  }
+}
