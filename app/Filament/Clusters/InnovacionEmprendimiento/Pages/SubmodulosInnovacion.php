@@ -17,18 +17,23 @@ class SubmodulosInnovacion extends Page
 
     protected static ?string $title = 'Eje 2: Innovación y Emprendimiento';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 0;
 
     protected static string $view = 'filament.clusters.submodulos-overview';
 
     public function getViewData(): array
     {
         $eje = CatEje::where('clave', 'EJE-02')->first();
+        $user = auth()->user();
+        $submodulos = CatSubmodulo::where('eje_id', $eje?->id)->orderBy('clave')->get();
+        if ($user && $user->esOperador()) {
+            $submodulos = $submodulos->filter(fn ($s) => $user->puedeCapturarSubmodulo($s->clave))->values();
+        }
 
         return [
             'ejeClave' => 'EJE 2',
             'ejeNombre' => $eje?->nombre ?? 'Innovación y Emprendimiento',
-            'submodulos' => CatSubmodulo::where('eje_id', $eje?->id)->orderBy('clave')->get(),
+            'submodulos' => $submodulos,
         ];
     }
 }

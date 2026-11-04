@@ -17,16 +17,23 @@ class SubmodulosExtension extends Page
 
     protected static ?string $title = 'Eje 4: Extensión';
 
+    protected static ?int $navigationSort = 0;
+
     protected static string $view = 'filament.clusters.submodulos-overview';
 
     public function getViewData(): array
     {
         $eje = CatEje::where('clave', 'EJE-04')->first();
+        $user = auth()->user();
+        $submodulos = CatSubmodulo::where('eje_id', $eje?->id)->orderBy('clave')->get();
+        if ($user && $user->esOperador()) {
+            $submodulos = $submodulos->filter(fn ($s) => $user->puedeCapturarSubmodulo($s->clave))->values();
+        }
 
         return [
             'ejeClave' => 'EJE 4',
             'ejeNombre' => $eje?->nombre ?? 'Extensión',
-            'submodulos' => CatSubmodulo::where('eje_id', $eje?->id)->orderBy('clave')->get(),
+            'submodulos' => $submodulos,
         ];
     }
 }

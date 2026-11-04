@@ -31,7 +31,7 @@ class MteResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Reportes MTE (2.2)';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     public static function canViewAny(): bool
     {
@@ -261,18 +261,7 @@ class MteResource extends Resource
                     ->dateTime('d/m/Y H:i')
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([
-                Tables\Filters\SelectFilter::make('periodo_id')
-                    ->label('Periodo')
-                    ->relationship('periodo', 'anio')
-                    ->options(CatPeriodo::all()->pluck('nombre_completo', 'id')),
-
-                Tables\Filters\SelectFilter::make('estado')
-                    ->options([
-                        'BORRADOR' => 'Borrador',
-                        'PUBLICADO' => 'Publicado',
-                    ]),
-            ])
+            ->filters(\App\Filament\Clusters\BaseSubmoduloResource::getCommonInstitutionalFilters())
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])

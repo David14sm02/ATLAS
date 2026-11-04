@@ -9,6 +9,24 @@ use LogicException;
 
 class RepDictamenLog extends Model
 {
+    public const ACCION_CREACION = 'CREACION';
+
+    public const ACCION_ACTUALIZACION = 'ACTUALIZACION';
+
+    public const ACCION_PUBLICACION = 'PUBLICACION';
+
+    public const ACCION_FIRMA_DELEGADA = 'FIRMA_DELEGADA';
+
+    public const ACCION_CARGA_EXCEL = 'CARGA_EXCEL';
+
+    public const ACCION_ELIMINACION = 'ELIMINACION';
+
+    public const ACCION_VALIDAR = 'VALIDAR';
+
+    public const ACCION_RECHAZAR = 'RECHAZAR';
+
+    public const ACCION_APERTURA_EXTEMPORANEA = 'APERTURA_EXTEMPORANEA';
+
     public $timestamps = false;
 
     protected $table = 'rep_dictamenes_log';

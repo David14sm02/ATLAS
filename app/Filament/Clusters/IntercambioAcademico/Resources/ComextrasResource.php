@@ -248,18 +248,7 @@ class ComextrasResource extends Resource
                         default => 'gray',
                     }),
             ])
-            ->filters([
-                Tables\Filters\SelectFilter::make('periodo_id')
-                    ->label('Periodo')
-                    ->relationship('periodo', 'anio')
-                    ->options(CatPeriodo::all()->pluck('nombre_completo', 'id')),
-
-                Tables\Filters\SelectFilter::make('estado')
-                    ->options([
-                        'BORRADOR' => 'Borrador',
-                        'PUBLICADO' => 'Publicado',
-                    ]),
-            ])
+            ->filters(\App\Filament\Clusters\BaseSubmoduloResource::getCommonInstitutionalFilters())
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])

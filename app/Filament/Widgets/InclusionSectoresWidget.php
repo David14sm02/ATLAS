@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\CatEntidad;
 use App\Models\CatPeriodo;
 use App\Models\RepRegistroBase;
 use Filament\Widgets\Widget;
@@ -14,34 +15,80 @@ class InclusionSectoresWidget extends Widget
 
     protected int|string|array $columnSpan = 'full';
 
+    public ?string $entidadFiltro = 'todas';
+
+    public ?string $regionFiltro = 'todas';
+
+    public ?string $sostenimientoFiltro = 'todos';
+
+    public function resetFiltrosGraficas(): void
+    {
+        $this->entidadFiltro = 'todas';
+        $this->regionFiltro = 'todas';
+        $this->sostenimientoFiltro = 'todos';
+    }
+
     public function getViewData(): array
     {
+        $user = auth()->user();
+        $esNacional = $user ? $user->esNacional() : true;
+        $esSupervisor = $user ? $user->esSupervisorTerritorial() : false;
+
         // 1. Periodo Trimestral Activo
         $periodo = CatPeriodo::where('bloqueado', false)->orderBy('anio')->orderBy('trimestre')->first()
             ?? CatPeriodo::orderByDesc('anio')->orderByDesc('trimestre')->first();
         $periodoId = $periodo?->id ?? 0;
 
-        // 2. Consulta de Registros del Periodo (Consolidado nacional)
-        $registros = RepRegistroBase::deTodosLosPlanteles()
-            ->with('submodulo')
-            ->where('periodo_id', $periodoId)
-            ->get();
+        // 2. Consulta de Registros del Periodo respetando alcance del rol y filtros interactivos
+        $query = RepRegistroBase::deTodosLosPlanteles()
+            ->with(['submodulo', 'plantel'])
+            ->where('periodo_id', $periodoId);
+
+        if (! $esNacional) {
+            if ($esSupervisor && $user?->entidad_id) {
+                $query->whereHas('plantel', fn ($q) => $q
+                    ->where('entidad_id', $user->entidad_id)
+                    ->where('sostenimiento', 'DESCENTRALIZADO'));
+            } elseif ($user?->plantel_id) {
+                $query->where('plantel_id', $user->plantel_id);
+            }
+        } else {
+            if ($this->entidadFiltro && $this->entidadFiltro !== 'todas') {
+                $query->whereHas('plantel', fn ($q) => $q->where('entidad_id', (int) $this->entidadFiltro));
+            }
+
+            if ($this->regionFiltro && $this->regionFiltro !== 'todas') {
+                $query->whereHas('plantel', fn ($q) => $q->where('region', (int) $this->regionFiltro));
+            }
+
+            if ($this->sostenimientoFiltro && $this->sostenimientoFiltro !== 'todos') {
+                $query->whereHas('plantel', function ($q) {
+                    if (in_array($this->sostenimientoFiltro, ['IT_FEDERAL', 'IT_DESCENTRALIZADO', 'CENTRO_ESPECIALIZADO'], true)) {
+                        $q->where('tipo_institucion', $this->sostenimientoFiltro);
+                    } else {
+                        $q->where('sostenimiento', $this->sostenimientoFiltro);
+                    }
+                });
+            }
+        }
+
+        $registros = $query->get();
 
         // 3. Paridad de Género: Estudiantes
-        $estudiantesMujeres = $registros->sum('estudiantes_mujeres');
-        $estudiantesHombres = $registros->sum('estudiantes_hombres');
+        $estudiantesMujeres = (int) $registros->sum('estudiantes_mujeres');
+        $estudiantesHombres = (int) $registros->sum('estudiantes_hombres');
         $totalEstudiantes = $estudiantesMujeres + $estudiantesHombres;
 
         $pctEstudiantesMujeres = $totalEstudiantes > 0
             ? round(($estudiantesMujeres / $totalEstudiantes) * 100, 1)
-            : 48.2; // Benchmark institucional TecNM si no hay registros cargados
+            : 48.2;
         $pctEstudiantesHombres = $totalEstudiantes > 0
             ? round(($estudiantesHombres / $totalEstudiantes) * 100, 1)
             : 51.8;
 
         // 4. Paridad de Género: Docentes
-        $docentesMujeres = $registros->sum('docentes_mujeres');
-        $docentesHombres = $registros->sum('docentes_hombres');
+        $docentesMujeres = (int) $registros->sum('docentes_mujeres');
+        $docentesHombres = (int) $registros->sum('docentes_hombres');
         $totalDocentes = $docentesMujeres + $docentesHombres;
 
         $pctDocentesMujeres = $totalDocentes > 0
@@ -64,14 +111,14 @@ class InclusionSectoresWidget extends Widget
         foreach ($registrosMte as $reg) {
             $sector = $reg->detalles_adicionales['sector_estrategico'] ?? $reg->datos_especificos['sector_estrategico'] ?? null;
             if ($sector && isset($sectoresConteo[$sector])) {
-                $sectoresConteo[$sector]++;
+                $sectoresConteo[$sector] += max(1, (int) ($reg->detalles_adicionales['proyectos_incubados'] ?? 1));
             }
         }
 
         $totalProyectosMte = array_sum($sectoresConteo);
         $tieneDatosMte = $totalProyectosMte > 0;
+        $tieneFiltrosActivos = $this->entidadFiltro !== 'todas' || $this->regionFiltro !== 'todas' || $this->sostenimientoFiltro !== 'todos';
 
-        // Metas / Proporción esperada nacional si aún no hay captura activa
         $sectoresData = [];
         $benchmarksMte = [
             'Tecnologías de la Información y Software' => ['porcentaje' => 34.5, 'proyectos' => 142],
@@ -82,8 +129,8 @@ class InclusionSectoresWidget extends Widget
         ];
 
         foreach ($sectoresConteo as $nombre => $conteo) {
-            if ($tieneDatosMte) {
-                $pct = round(($conteo / $totalProyectosMte) * 100, 1);
+            if ($tieneDatosMte || $tieneFiltrosActivos) {
+                $pct = $totalProyectosMte > 0 ? round(($conteo / $totalProyectosMte) * 100, 1) : 0;
                 $sectoresData[] = [
                     'nombre' => $nombre,
                     'proyectos' => $conteo,
@@ -112,7 +159,7 @@ class InclusionSectoresWidget extends Widget
         foreach ($registrosComextras as $reg) {
             $modalidad = $reg->detalles_adicionales['tipo_modalidad'] ?? $reg->datos_especificos['tipo_modalidad'] ?? null;
             if ($modalidad && isset($modalidadesConteo[$modalidad])) {
-                $modalidadesConteo[$modalidad] += ($reg->total_general ?? 1);
+                $modalidadesConteo[$modalidad] += max(1, (int) ($reg->total_general ?? 1));
             }
         }
 
@@ -129,8 +176,8 @@ class InclusionSectoresWidget extends Widget
         ];
 
         foreach ($modalidadesConteo as $nombre => $participantes) {
-            if ($tieneDatosComextras) {
-                $pct = round(($participantes / $totalParticipantesComextras) * 100, 1);
+            if ($tieneDatosComextras || $tieneFiltrosActivos) {
+                $pct = $totalParticipantesComextras > 0 ? round(($participantes / $totalParticipantesComextras) * 100, 1) : 0;
                 $modalidadesData[] = [
                     'nombre' => $nombre,
                     'participantes' => $participantes,
@@ -149,14 +196,25 @@ class InclusionSectoresWidget extends Widget
         $totalGeneral = $totalEstudiantes + $totalDocentes;
 
         $paridadDonutData = [
-            ['name' => 'Alumnas', 'value' => $estudiantesMujeres > 0 ? $estudiantesMujeres : 48, 'itemStyle' => ['color' => '#A57F2C']],
-            ['name' => 'Alumnos', 'value' => $estudiantesHombres > 0 ? $estudiantesHombres : 52, 'itemStyle' => ['color' => '#1B396A']],
-            ['name' => 'Docentes M.', 'value' => $docentesMujeres > 0 ? $docentesMujeres : 15, 'itemStyle' => ['color' => '#F59E0B']],
-            ['name' => 'Docentes H.', 'value' => $docentesHombres > 0 ? $docentesHombres : 20, 'itemStyle' => ['color' => '#3B82F6']],
+            ['name' => 'Alumnas', 'value' => $totalGeneral > 0 ? $estudiantesMujeres : ($tieneFiltrosActivos ? 0 : 48), 'itemStyle' => ['color' => '#A57F2C']],
+            ['name' => 'Alumnos', 'value' => $totalGeneral > 0 ? $estudiantesHombres : ($tieneFiltrosActivos ? 0 : 52), 'itemStyle' => ['color' => '#1B396A']],
+            ['name' => 'Docentes M.', 'value' => $totalGeneral > 0 ? $docentesMujeres : ($tieneFiltrosActivos ? 0 : 15), 'itemStyle' => ['color' => '#F59E0B']],
+            ['name' => 'Docentes H.', 'value' => $totalGeneral > 0 ? $docentesHombres : ($tieneFiltrosActivos ? 0 : 20), 'itemStyle' => ['color' => '#3B82F6']],
         ];
+
+        // Emitir evento reactivo para que las 3 gráficas de ECharts se actualicen en vivo al mover los filtros
+        $this->dispatch(
+            'atlas-graficas-actualizadas',
+            paridad: $paridadDonutData,
+            sectores: $sectoresData,
+            modalidades: $modalidadesData
+        );
 
         return [
             'periodo' => $periodo,
+            'esNacional' => $esNacional,
+            'alcanceLabel' => $esNacional ? 'INTELIGENCIA NACIONAL' : ($esSupervisor ? 'ALCANCE ESTATAL OPD' : ($user?->plantel?->siglas ?? 'MI PLANTEL')),
+            'entidadesCatalogo' => $esNacional ? CatEntidad::orderBy('clave_inegi')->get(['id', 'clave_inegi', 'nombre']) : collect(),
             'tieneDatosReales' => $registros->count() > 0,
             'totalGeneral' => $totalGeneral,
             'totalEstudiantes' => $totalEstudiantes,

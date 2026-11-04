@@ -37,11 +37,11 @@
                             @if ($submodulo->activo_mvp)
                                 <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 text-xs font-semibold text-tecnm-green border border-emerald-200 dark:border-emerald-800">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400"><path fill-rule="evenodd" d="M16.403 12.652a3 3 0 0 0 0-5.304 3 3 0 0 0-3.75-3.751 3 3 0 0 0-5.305 0 3 3 0 0 0-3.751 3.75 3 3 0 0 0 0 5.305 3 3 0 0 0 3.75 3.751 3 3 0 0 0 5.305 0 3 3 0 0 0 3.751-3.75Zm-2.546-4.46a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.06l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd" /></svg>
-                                    Funcional MVP
+                                    Prioritario MVP
                                 </span>
                             @else
-                                <span class="inline-flex items-center rounded-full bg-amber-50 dark:bg-amber-950/40 px-2.5 py-0.5 text-xs font-medium text-tecnm-gold border border-amber-200 dark:border-amber-800">
-                                    Fase 2
+                                <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 dark:bg-blue-950/40 px-2.5 py-0.5 text-xs font-medium text-tecnm-blue dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                                    Habilitado
                                 </span>
                             @endif
                         </div>
@@ -55,16 +55,14 @@
 
                     <div class="mt-5 pt-3 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
                         <span class="text-xs text-gray-500 dark:text-gray-400">
-                            Estatus: {{ $submodulo->activo_mvp ? 'Captura Habilitada' : 'Estructura Lista' }}
+                            Estatus: {{ $submodulo->activo_mvp ? 'Captura Prioritaria MVP' : 'Captura Habilitada' }}
                         </span>
-                        @if ($submodulo->clave === '2.2')
-                            <a href="{{ \App\Filament\Clusters\InnovacionEmprendimiento\Resources\MteResource::getUrl('index') }}" 
-                               class="inline-flex items-center text-xs font-semibold text-tecnm-blue hover:underline">
-                                Ir al módulo &rarr;
-                            </a>
-                        @elseif ($submodulo->clave === '3.1')
-                            <a href="{{ \App\Filament\Clusters\IntercambioAcademico\Resources\ComextrasResource::getUrl('index') }}" 
-                               class="inline-flex items-center text-xs font-semibold text-tecnm-blue hover:underline">
+                        @php
+                            $moduloUrl = \App\Filament\Clusters\BaseSubmoduloResource::getUrlForClave($submodulo->clave);
+                        @endphp
+                        @if ($moduloUrl)
+                            <a href="{{ $moduloUrl }}" 
+                               class="inline-flex items-center gap-1 text-xs font-semibold text-tecnm-blue dark:text-blue-400 hover:underline">
                                 Ir al módulo &rarr;
                             </a>
                         @else

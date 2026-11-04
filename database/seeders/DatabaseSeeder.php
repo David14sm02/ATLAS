@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             PeriodosSeeder::class,
             PlantelesSeeder::class,
             UsersRolesSeeder::class,
+            RegistrosDemoSeeder::class,
         ]);
     }
 }

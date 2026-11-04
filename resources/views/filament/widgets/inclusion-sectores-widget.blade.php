@@ -7,21 +7,75 @@
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" /></svg>
                 </span>
                 <div>
-                    <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2 flex-wrap">
                         Analítica Estratégica: Paridad, Vocación y Formación Integral
                         <span class="text-[10px] px-2 py-0.5 rounded-full font-bold text-white tracking-wider" style="background-color: #1E5B4F;">
-                            INTELIGENCIA NACIONAL
+                            {{ $alcanceLabel ?? 'INTELIGENCIA NACIONAL' }}
                         </span>
                     </h3>
                     <p class="text-xs text-gray-500 dark:text-gray-400">
-                        Indicadores de impacto transversal sin saturación de texto
+                        Indicadores de impacto transversal • Corte {{ $periodo?->nombre_completo ?? 'Trimestral 2026' }}
                     </p>
                 </div>
             </div>
 
-            <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 font-semibold">
-                <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Corte {{ $periodo?->nombre_completo ?? 'Trimestral 2026' }}</span>
+            {{-- Filtros Interactivos para Analítica de Gráficas --}}
+            <div class="flex flex-wrap items-center gap-2">
+                @if ($esNacional ?? true)
+                    <div class="flex items-center gap-1 text-xs">
+                        <label class="text-gray-600 dark:text-gray-400 font-medium">Estado:</label>
+                        <select
+                            wire:model.live="entidadFiltro"
+                            class="text-xs rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-[#1E5B4F] focus:ring-[#1E5B4F] py-1 px-2 font-medium transition shadow-xs"
+                        >
+                            <option value="todas">Todos los Estados (32)</option>
+                            @foreach ($entidadesCatalogo ?? [] as $ent)
+                                <option value="{{ $ent->id }}">{{ $ent->clave_inegi }} - {{ $ent->nombre }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="flex items-center gap-1 text-xs">
+                        <label class="text-gray-600 dark:text-gray-400 font-medium">Región:</label>
+                        <select
+                            wire:model.live="regionFiltro"
+                            class="text-xs rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-[#1E5B4F] focus:ring-[#1E5B4F] py-1 px-2 font-medium transition shadow-xs"
+                        >
+                            <option value="todas">Todas (1-9)</option>
+                            @for ($r = 1; $r <= 9; $r++)
+                                <option value="{{ $r }}">Región {{ $r }}</option>
+                            @endfor
+                        </select>
+                    </div>
+
+                    <div class="flex items-center gap-1 text-xs">
+                        <label class="text-gray-600 dark:text-gray-400 font-medium">Tipo:</label>
+                        <select
+                            wire:model.live="sostenimientoFiltro"
+                            class="text-xs rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-[#1E5B4F] focus:ring-[#1E5B4F] py-1 px-2 font-medium transition shadow-xs"
+                        >
+                            <option value="todos">Todos (266)</option>
+                            <option value="IT_FEDERAL">Federales (126)</option>
+                            <option value="IT_DESCENTRALIZADO">Descentralizados OPD (134)</option>
+                            <option value="CENTRO_ESPECIALIZADO">Centros Especializados (6)</option>
+                        </select>
+                    </div>
+
+                    @if ($entidadFiltro !== 'todas' || $regionFiltro !== 'todas' || $sostenimientoFiltro !== 'todos')
+                        <button
+                            wire:click="resetFiltrosGraficas"
+                            type="button"
+                            class="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-lg font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 transition"
+                        >
+                            Limpiar
+                        </button>
+                    @endif
+                @else
+                    <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 font-semibold">
+                        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>Métricas Filtradas por Alcance Institucional</span>
+                    </div>
+                @endif
             </div>
         </div>
 
@@ -31,6 +85,7 @@
             {{-- Gráfica 1: Donut de Paridad y Estructura Demográfica --}}
             <div
                 class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs p-4 flex flex-col justify-between"
+                @atlas-graficas-actualizadas.window="if ($event.detail && $event.detail.paridad) { data = $event.detail.paridad; render(); }"
                 x-data="{
                     chart: null,
                     data: {{ $paridadDonutJson }},
@@ -130,6 +185,7 @@
             {{-- Gráfica 2: Barras Horizontales de Sectores Estratégicos MTE (2.2) --}}
             <div
                 class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs p-4 flex flex-col justify-between"
+                @atlas-graficas-actualizadas.window="if ($event.detail && $event.detail.sectores) { data = $event.detail.sectores; render(); }"
                 x-data="{
                     chart: null,
                     data: {{ $sectoresJson }},
@@ -246,6 +302,7 @@
             {{-- Gráfica 3: Barras de Modalidades COMEXTRAS (3.1) --}}
             <div
                 class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs p-4 flex flex-col justify-between"
+                @atlas-graficas-actualizadas.window="if ($event.detail && $event.detail.modalidades) { data = $event.detail.modalidades; render(); }"
                 x-data="{
                     chart: null,
                     data: {{ $modalidadesJson }},

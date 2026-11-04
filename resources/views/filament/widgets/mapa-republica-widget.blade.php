@@ -31,14 +31,14 @@
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tecnm-blue"><path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z" /></svg>
                     </span>
                     <div>
-                        <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                            Cartografia y Despliegue Territorial
+                        <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2 flex-wrap">
+                            Cartografía y Despliegue Territorial
                             <span class="text-xs px-2.5 py-0.5 rounded-full font-semibold text-white tracking-wide" style="background-color: #1B396A;">
-                                32 ENTIDADES
+                                {{ $totalPlantelesFiltradosNacional ?? 266 }} PLANTELES • {{ $totalEntidades }} ESTADOS
                             </span>
                         </h3>
                         <p class="text-xs text-gray-500 dark:text-gray-400">
-                            Avance geoespacial de reporte y cobertura institucional en la Republica Mexicana
+                            Avance geoespacial de reporte y cobertura institucional en la República Mexicana
                         </p>
                     </div>
                 </div>
@@ -46,42 +46,69 @@
 
             {{-- Filtros Interactivos --}}
             <div class="flex flex-wrap items-center gap-2.5">
-                {{-- Selector de Submodulo --}}
+                {{-- Selector de Eje / Submódulo (35 submódulos agrupados) --}}
                 <div class="flex items-center gap-1.5 text-xs">
-                    <label class="text-gray-600 dark:text-gray-400 font-medium">Submodulo:</label>
+                    <label class="text-gray-600 dark:text-gray-400 font-medium">Módulo:</label>
                     <select
                         wire:model.live="submoduloFiltro"
-                        class="text-xs rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-[#1B396A] focus:ring-[#1B396A] py-1.5 px-2.5 font-medium transition shadow-xs"
+                        class="text-xs rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-[#1B396A] focus:ring-[#1B396A] py-1.5 px-2.5 font-medium transition shadow-xs max-w-[240px]"
                     >
-                        <option value="todos">Todos los Submodulos Activos</option>
-                        @foreach ($submodulos as $sub)
-                            <option value="{{ $sub->clave }}">{{ $sub->clave }} {{ $sub->nombre }}</option>
+                        <option value="todos">Todos los Submódulos (35)</option>
+                        <optgroup label="Por Eje Institucional">
+                            <option value="EJE-01">Todo Eje 1: Vinculación Estratégica</option>
+                            <option value="EJE-02">Todo Eje 2: Innovación y Emprendimiento</option>
+                            <option value="EJE-03">Todo Eje 3: Intercambio Académico</option>
+                            <option value="EJE-04">Todo Eje 4: Extensión</option>
+                        </optgroup>
+                        @foreach ($submodulos->groupBy(fn ($s) => $s->eje?->nombre ?? 'General') as $ejeNombre => $grupo)
+                            <optgroup label="{{ $ejeNombre }}">
+                                @foreach ($grupo as $sub)
+                                    <option value="{{ $sub->clave }}">
+                                        {{ $sub->clave }} {{ \Illuminate\Support\Str::limit($sub->nombre, 34) }}{{ $sub->activo_mvp ? ' ★' : '' }}
+                                    </option>
+                                @endforeach
+                            </optgroup>
                         @endforeach
                     </select>
                 </div>
 
-                {{-- Selector de Sostenimiento --}}
+                {{-- Selector de Región Oficial TecNM (1 a 9) --}}
                 <div class="flex items-center gap-1.5 text-xs">
-                    <label class="text-gray-600 dark:text-gray-400 font-medium">Sostenimiento:</label>
+                    <label class="text-gray-600 dark:text-gray-400 font-medium">Región:</label>
+                    <select
+                        wire:model.live="regionFiltro"
+                        class="text-xs rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-[#1B396A] focus:ring-[#1B396A] py-1.5 px-2.5 font-medium transition shadow-xs"
+                    >
+                        <option value="todas">Todas las Regiones (1-9)</option>
+                        @for ($r = 1; $r <= 9; $r++)
+                            <option value="{{ $r }}">Región {{ $r }}</option>
+                        @endfor
+                    </select>
+                </div>
+
+                {{-- Selector de Sostenimiento / Tipo de Institución --}}
+                <div class="flex items-center gap-1.5 text-xs">
+                    <label class="text-gray-600 dark:text-gray-400 font-medium">Tipo:</label>
                     <select
                         wire:model.live="sostenimientoFiltro"
                         class="text-xs rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-[#1B396A] focus:ring-[#1B396A] py-1.5 px-2.5 font-medium transition shadow-xs"
                     >
-                        <option value="todos">Todos (Federales y Descentralizados)</option>
-                        <option value="FEDERAL">Solo Federales</option>
-                        <option value="DESCENTRALIZADO">Solo Descentralizados</option>
+                        <option value="todos">Todos los Planteles y Centros (266)</option>
+                        <option value="IT_FEDERAL">Federales Centralizados (126)</option>
+                        <option value="IT_DESCENTRALIZADO">Descentralizados OPD (134)</option>
+                        <option value="CENTRO_ESPECIALIZADO">Centros Especializados CRODE/CIIDET/CENIDET (6)</option>
                     </select>
                 </div>
 
-                @if ($selectedEstadoClave)
+                @if ($selectedEstadoClave || $submoduloFiltro !== 'todos' || $sostenimientoFiltro !== 'todos' || $regionFiltro !== 'todas')
                     <button
-                        wire:click="resetSeleccion"
+                        wire:click="resetFiltros"
                         type="button"
                         class="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 transition"
-                        title="Restablecer vista a toda la Republica"
+                        title="Restablecer filtros y vista a toda la República"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5"><path fill-rule="evenodd" d="M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.433a.75.75 0 0 0 0-1.5H4.75A.75.75 0 0 0 4 12.83v3.401a.75.75 0 0 0 1.5 0v-1.62l.313.312a7 7 0 0 0 11.742-3.166.75.75 0 0 0-1.243-.333Zm-10.624-2.85a5.5 5.5 0 0 1 9.201-2.465l.312.31H11.77a.75.75 0 0 0 0 1.5h3.482a.75.75 0 0 0 .75-.75V3.768a.75.75 0 0 0-1.5 0v1.62l-.313-.312A7 7 0 0 0 2.445 8.242a.75.75 0 0 0 1.243.333Z" clip-rule="evenodd" /></svg>
-                        Vista Nacional
+                        Limpiar Filtros
                     </button>
                 @endif
             </div>
@@ -93,6 +120,7 @@
             <div
                 style="flex: 2 1 600px; min-width: 320px; position: relative; min-height: 540px;"
                 class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xs p-4 flex flex-col justify-between"
+                @atlas-mapa-actualizado.window="actualizarDatosMapa($event.detail.seriesData)"
                 x-data="{
                     map: null,
                     geojsonLayer: null,
@@ -101,6 +129,54 @@
                     seriesData: {{ $mapSeriesJson }},
                     selectedClave: @entangle('selectedEstadoClave'),
                     dataMap: {},
+
+                    generarTooltipHtml(clave, fallbackName) {
+                        const item = this.dataMap[clave] || {
+                            nombre_oficial: fallbackName,
+                            total_planteles: 0,
+                            federales: 0,
+                            descentralizados: 0,
+                            total_participantes: 0,
+                            porcentaje_cumplimiento: 0
+                        };
+
+                        return `
+                            <div style='min-width: 175px;'>
+                                <div style='display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.25); padding-bottom:3px; margin-bottom:5px;'>
+                                    <strong style='font-size:13px; color:#FFFFFF;'>${item.nombre_oficial || fallbackName}</strong>
+                                    <span style='background:rgba(165,127,44,0.4); color:#E8D39E; font-size:10px; font-weight:bold; padding:1px 4px; border-radius:3px;'>INEGI ${clave}</span>
+                                </div>
+                                <div style='font-size:11px; line-height:1.5; color:#E2E8F0;'>
+                                    <div>Planteles: <strong>${item.total_planteles}</strong> <span style='font-size:10px; color:#A4C3E8;'>(Fed: ${item.federales} | Desc: ${item.descentralizados})</span></div>
+                                    <div>Población: <strong>${Number(item.total_participantes || 0).toLocaleString()}</strong></div>
+                                    <div>Cumplimiento: <strong>${item.porcentaje_cumplimiento}%</strong></div>
+                                </div>
+                                <div style='margin-top:5px; font-size:10px; color:#A57F2C; font-weight:bold; text-align:right;'>
+                                    Clic para ver detalle e institutos
+                                </div>
+                            </div>
+                        `;
+                    },
+
+                    actualizarDatosMapa(nuevaLista) {
+                        if (!Array.isArray(nuevaLista)) return;
+                        this.seriesData = nuevaLista;
+                        this.dataMap = {};
+                        nuevaLista.forEach(d => {
+                            this.dataMap[d.clave_inegi] = d;
+                        });
+
+                        if (this.geojsonLayer) {
+                            const self = this;
+                            this.geojsonLayer.eachLayer((layer) => {
+                                if (layer.feature && layer.feature.properties) {
+                                    const clave = layer.feature.properties.clave_inegi;
+                                    layer.setStyle(self.obtenerEstiloFeature(layer.feature));
+                                    layer.setTooltipContent(self.generarTooltipHtml(clave, layer.feature.properties.name));
+                                }
+                            });
+                        }
+                    },
 
                     init() {
                         try {
@@ -222,31 +298,7 @@
                                 style: (feature) => self.obtenerEstiloFeature(feature),
                                 onEachFeature: function (feature, layer) {
                                     const clave = feature.properties.clave_inegi;
-                                    const item = self.dataMap[clave] || {
-                                        nombre_oficial: feature.properties.name,
-                                        total_planteles: 0,
-                                        federales: 0,
-                                        descentralizados: 0,
-                                        total_participantes: 0,
-                                        porcentaje_cumplimiento: 0
-                                    };
-
-                                    const tooltipHtml = `
-                                        <div style='min-width: 170px;'>
-                                            <div style='display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.25); padding-bottom:3px; margin-bottom:5px;'>
-                                                <strong style='font-size:13px; color:#FFFFFF;'>${item.nombre_oficial || feature.properties.name}</strong>
-                                                <span style='background:rgba(165,127,44,0.4); color:#E8D39E; font-size:10px; font-weight:bold; padding:1px 4px; border-radius:3px;'>INEGI ${clave}</span>
-                                            </div>
-                                            <div style='font-size:11px; line-height:1.5; color:#E2E8F0;'>
-                                                <div>Planteles: ${item.total_planteles} <span style='font-size:10px; color:#A4C3E8;'>(Fed: ${item.federales} | Desc: ${item.descentralizados})</span></div>
-                                                <div>Poblacion: ${Number(item.total_participantes).toLocaleString()}</div>
-                                                <div>Cumplimiento: ${item.porcentaje_cumplimiento}%</div>
-                                            </div>
-                                            <div style='margin-top:5px; font-size:10px; color:#A57F2C; font-weight:bold; text-align:right;'>
-                                                Clic para ver detalle
-                                            </div>
-                                        </div>
-                                    `;
+                                    const tooltipHtml = self.generarTooltipHtml(clave, feature.properties.name);
 
                                     layer.bindTooltip(tooltipHtml, {
                                         sticky: true,
@@ -478,7 +530,7 @@
                         </div>
 
                         {{-- Desglose de Población Participante --}}
-                        <div class="p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/80 mb-4">
+                        <div class="p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/80 mb-3.5">
                             <div class="flex items-center justify-between text-xs mb-1">
                                 <span class="font-bold text-gray-600 dark:text-gray-400">Población Reportada:</span>
                                 <span class="font-black text-tecnm-blue text-sm">
@@ -491,6 +543,43 @@
                                 <span>{{ number_format($estadoSeleccionado['total_docentes'] ?? 0) }} Docentes</span>
                             </div>
                         </div>
+
+                        {{-- Directorio de Planteles del Estado Seleccionado --}}
+                        @if (! empty($estadoSeleccionado['lista_planteles']))
+                            <div class="mb-3.5">
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 block mb-2">
+                                    Institutos en {{ $estadoSeleccionado['abreviatura'] }} ({{ count($estadoSeleccionado['lista_planteles']) }})
+                                </span>
+                                <div class="max-h-48 overflow-y-auto space-y-1.5 pr-1">
+                                    @foreach ($estadoSeleccionado['lista_planteles'] as $pl)
+                                        <div class="p-2 rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex items-center justify-between gap-2 text-xs">
+                                            <div class="min-w-0 flex-1">
+                                                <div class="flex items-center gap-1.5">
+                                                    <span class="font-mono font-bold text-[10px] px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-950 text-tecnm-blue dark:text-blue-300">
+                                                        {{ $pl['siglas'] }}
+                                                    </span>
+                                                    <span class="text-[10px] text-gray-500 dark:text-gray-400">
+                                                        Reg. {{ $pl['region'] ?? '-' }} • {{ $pl['tipo_institucion'] === 'IT_DESCENTRALIZADO' ? 'OPD' : ($pl['tipo_institucion'] === 'CENTRO_ESPECIALIZADO' ? 'Centro' : 'Federal') }}
+                                                    </span>
+                                                </div>
+                                                <div class="font-medium text-gray-800 dark:text-gray-200 truncate mt-0.5" title="{{ $pl['nombre'] }}">
+                                                    {{ $pl['nombre'] }}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                @if ($pl['estatus_reporte'] === 'PUBLICADO')
+                                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">Al Día</span>
+                                                @elseif ($pl['estatus_reporte'] === 'BORRADOR')
+                                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300">Borrador</span>
+                                                @else
+                                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300">Pendiente</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
 
                         <div class="pt-1">
                             <button
