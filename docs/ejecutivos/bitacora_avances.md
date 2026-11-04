@@ -18,6 +18,7 @@
 | **Hito 4** | Pendiente | Ingesta asíncrona de archivos Excel con validación en segundo plano (*dry-run*) | *PENDIENTE (Por acordar con el equipo)* |
 | **Hito 5** | 23/Sep/2026 | Tablero Directivo Nacional (Propuesta C - Storytelling UX en 3 Bloques) | **COMPLETADO** |
 | **Hito 6** | 02/Nov/2026 | Roles v2.1 (R1–R6), Catálogo Oficial de 266 Planteles, Bitácora Forense Inmutable y Oráculo MCP | **COMPLETADO** |
+| **Hito 7** | 03/Nov/2026 | 35 Submódulos en 4 Ejes, Filtros Reactivos en Mapa/Gráficas, Seeder Demo y Gestión de Usuarios (`UserResource`) | **COMPLETADO** |
 
 ---
 
@@ -114,4 +115,17 @@
 * **Estatus del Hito 6:** **CONCLUIDO EXITOSAMENTE**.
 
 ---
-*(Siguiente hito del roadmap: Retomar Hito 4 - Ingesta Asíncrona de Excel F.37 / F.32 tras validación de plantillas con el equipo).*
+
+### [Hito 7] - Habilitación de los 35 Submódulos en los 4 Ejes, Filtros Reactivos en Vivo y Gestión de Usuarios (`UserResource`)
+* **Fecha:** 03 de Noviembre de 2026
+* **Responsable:** Fábrica de Software
+* **Objetivo:** Integrar el PR #1 (*Scoped Multi-Tenancy* y mejoras de Docker/PgBouncer), habilitar las 35 pestañas y tablas operativas de los 4 Ejes Institucionales, conectar filtros reactivos en tiempo real en el Mapa de la República y en el Bloque 3 de Gráficas ECharts, poblar datos demostrativos (`RegistrosDemoSeeder`) y construir el módulo `UserResource` para que Superadmins y Directores de Plantel administren usuarios y asignen submódulos visualmente.
+* **Entregables Principales:**
+  1. **Arquitectura de los 35 Submódulos (`BaseSubmoduloResource` y `BaseManageSubmodulo`):** 51 rutas administrativas activas en los 4 Clusters (`Eje 1: 1.1–1.8`, `Eje 2: 2.1–2.8`, `Eje 3: 3.1–3.7`, `Eje 4: 4.1–4.12`) con 5 filtros institucionales homologados.
+  2. **Mapa y Gráficas 100% Reactivos (`MapaRepublicaWidget` e `InclusionSectoresWidget`):** Filtros en vivo por Módulo/Eje, Región (`1–9`), Estado (`01–32`) y Tipo de Institución (`126 Federales`, `134 Descentralizados OPD`, `6 Centros Especializados`), con directorio de planteles por entidad seleccionada.
+  3. **Módulo de Usuarios y Permisos (`UserResource` y `ManageUsers`):** Gestión Multi-Tenant con candados anti-escalamiento, asignación matricial `CheckboxList` de los 35 submódulos, revocación institucional (`toggleAcceso`) y trazabilidad automática en `RepDictamenLog`.
+  4. **Documentación Ejecutiva y Técnica:** `docs/ejecutivos/reporte_avances_clusters_filtros_y_gestion_usuarios.md` y `docs/tecnica/guia_frontend_roles_vistas_y_scoped_multitenancy.md`.
+* **Estatus del Hito 7:** **CONCLUIDO EXITOSAMENTE**.
+
+---
+*(Siguiente hito del roadmap: Flujo de Firma Oficial / Rechazo en tablas de captura y Retomar Hito 4 - Ingesta Asíncrona de Excel F.37 / F.32).*
