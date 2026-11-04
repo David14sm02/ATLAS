@@ -42,12 +42,14 @@ class PulsoNacionalWidget extends Widget
             $totalPlantelesRegistrados = CatPlantel::where('activo', true)->count();
             $metaPlanteles = $totalPlantelesRegistrados > 0 ? $totalPlantelesRegistrados : 263;
 
-            $plantelesPublicados = RepRegistroBase::where('periodo_id', $periodoId)
+            $plantelesPublicados = RepRegistroBase::deTodosLosPlanteles()
+                ->where('periodo_id', $periodoId)
                 ->where('estado', 'PUBLICADO')
                 ->distinct('plantel_id')
                 ->count('plantel_id');
 
-            $plantelesBorrador = RepRegistroBase::where('periodo_id', $periodoId)
+            $plantelesBorrador = RepRegistroBase::deTodosLosPlanteles()
+                ->where('periodo_id', $periodoId)
                 ->where('estado', 'BORRADOR')
                 ->whereNotIn('plantel_id', function ($query) use ($periodoId) {
                     $query->select('plantel_id')
@@ -64,7 +66,9 @@ class PulsoNacionalWidget extends Widget
                 ? round(($plantelesPublicados / $metaPlanteles) * 100, 1)
                 : 0;
 
-            $registrosPeriodo = RepRegistroBase::where('periodo_id', $periodoId)->get();
+            $registrosPeriodo = RepRegistroBase::deTodosLosPlanteles()
+                ->where('periodo_id', $periodoId)
+                ->get();
 
             $totalGeneral = $registrosPeriodo->sum('total_general');
             $totalDocentes = $registrosPeriodo->sum('total_docentes');

@@ -54,22 +54,9 @@ class MteResource extends Resource
     {
         $submodulo = CatSubmodulo::where('clave', '2.2')->first();
 
-        $query = parent::getEloquentQuery()
+        // El aislamiento Multi-Tenancy (Plantel y Supervisión Estatal OPD) se aplica vía BelongsToPlantel (PlantelScope)
+        return parent::getEloquentQuery()
             ->where('submodulo_id', $submodulo?->id ?? 0);
-
-        // Aislamiento Multi-Tenancy por Rol (Plantel o Supervisión Estatal OPD)
-        $user = Auth::user();
-        if ($user && ! $user->esNacional()) {
-            if ($user->esSupervisorTerritorial() && $user->entidad_id) {
-                $query->whereHas('plantel', fn (Builder $q) => $q
-                    ->where('entidad_id', $user->entidad_id)
-                    ->where('sostenimiento', 'DESCENTRALIZADO'));
-            } elseif ($user->plantel_id) {
-                $query->where('plantel_id', $user->plantel_id);
-            }
-        }
-
-        return $query;
     }
 
     public static function form(Form $form): Form
@@ -92,7 +79,10 @@ class MteResource extends Resource
 
                         Forms\Components\Select::make('plantel_id')
                             ->label('Instituto Tecnológico / Centro')
-                            ->options(CatPlantel::where('activo', true)->pluck('nombre', 'id'))
+                            ->options(fn () => $esNacional
+                                ? CatPlantel::where('activo', true)->pluck('nombre', 'id')
+                                : ($user?->plantel_id ? CatPlantel::where('id', $user->plantel_id)->pluck('nombre', 'id') : [])
+                            )
                             ->required()
                             ->searchable()
                             ->preload()

@@ -124,8 +124,8 @@ class MapaRepublicaWidget extends Widget
             }
         }])->orderBy('clave_inegi')->get();
 
-        // 4. Consulta de Registros de Reporte filtrados
-        $registrosBase = RepRegistroBase::query()
+        // 4. Consulta de Registros de Reporte filtrados (Alcance nacional consolidado para el mapa interactivo)
+        $registrosBase = RepRegistroBase::deTodosLosPlanteles()
             ->with(['plantel.entidad', 'submodulo'])
             ->where('periodo_id', $periodoId);
 

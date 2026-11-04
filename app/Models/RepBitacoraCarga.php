@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use App\Models\Concerns\RegistraBitacoraForense;
+use App\Models\Traits\BelongsToPlantel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RepBitacoraCarga extends Model
 {
-    use HasFactory, RegistraBitacoraForense;
+    use BelongsToPlantel, HasFactory, RegistraBitacoraForense;
 
     protected $table = 'rep_bitacora_cargas';
 
@@ -32,11 +33,6 @@ class RepBitacoraCarga extends Model
             'filas_con_error' => 'integer',
             'errores_detalle' => 'array',
         ];
-    }
-
-    public function plantel(): BelongsTo
-    {
-        return $this->belongsTo(CatPlantel::class, 'plantel_id');
     }
 
     public function user(): BelongsTo

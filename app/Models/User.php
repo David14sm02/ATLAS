@@ -89,11 +89,11 @@ class User extends Authenticatable implements FilamentUser
     }
 
     /**
-     * Regla de acceso al panel Filament: requiere usuario activo y no revocado.
+     * Regla de acceso al panel Filament: requiere correo válido, usuario activo y no revocado.
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        return (bool) ($this->activo ?? true) && is_null($this->revocado_at);
+        return ! empty($this->email) && (bool) ($this->activo ?? true) && is_null($this->revocado_at);
     }
 
     /**
@@ -214,5 +214,13 @@ class User extends Authenticatable implements FilamentUser
         }
 
         return $this->submodulosAsignados()->where('clave', $claveSubmodulo)->exists();
+    }
+
+    /**
+     * Determina si el usuario está restringido a un plantel específico.
+     */
+    public function esPlantel(): bool
+    {
+        return ! is_null($this->plantel_id);
     }
 }

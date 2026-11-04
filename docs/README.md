@@ -35,6 +35,9 @@ docs/
 * **[ver_diagrama_erd.html](base_datos/ver_diagrama_erd.html):** Visor web interactivo con zoom y controles para inspeccionar el modelo.
 
 ### 3. Documentación Técnica y Desarrollo (`docs/tecnica/`)
+* **[guia_frontend_roles_vistas_y_scoped_multitenancy.md](tecnica/guia_frontend_roles_vistas_y_scoped_multitenancy.md):** Guía maestra para el equipo de Frontend: aclaración arquitectónica (*Scoped Multi-Tenancy* en base única vs. multi-base), uso de los 13 perfiles de prueba (`R1`–`R6`), creación de vistas por rol con `canView()`, manejo de estilos (`atlas-theme.css` + Tailwind) y flujo de ramas en GitHub.
+* **[arquitectura_scoped_multi_tenancy.md](tecnica/arquitectura_scoped_multi_tenancy.md):** Especificación técnica del Scoped Multi-Tenancy (Row-Level Security), aislamiento por plantel sin subdominios, integración en Filament y resultados de la auditoría en Neon PostgreSQL.
+* **[resolucion_error_25p02_pgbouncer_neon.md](tecnica/resolucion_error_25p02_pgbouncer_neon.md):** Diagnóstico técnico y resolución del error SQLSTATE[25P02] provocado por PgBouncer (Transaction Pooling) en Neon, configuración de prepared statements y migración de caché/sesiones a Redis.
 * **[manual_tecnico_desarrolladores.md](tecnica/manual_tecnico_desarrolladores.md):** Manual maestro de onboarding para desarrolladores (8 módulos: arquitectura, Laravel 11, Filament v3, Clusters, Modelos y Widgets).
 * **[guia_entorno_desarrollo.md](tecnica/guia_entorno_desarrollo.md):** Guía paso a paso para configurar el entorno local (Herd/Sail, PHP 8.4, Composer, Git).
 * **[diseno_tablero_directivo_nacional.md](tecnica/diseno_tablero_directivo_nacional.md):** Especificaciones de diseño UI/UX y tokens de los 3 bloques narrativos del Dashboard principal.

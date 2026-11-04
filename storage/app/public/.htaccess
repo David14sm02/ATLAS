@@ -1,0 +1,7 @@
+# Block direct execution of scripts in user-uploaded file storage
+<FilesMatch "(?i)\.(php|phtml|phar|pl|py|jsp|asp|sh|cgi|exe|bat|cmd)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+Options -Indexes -ExecCGI
