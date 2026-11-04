@@ -35,18 +35,12 @@ class MteResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
+        
         $submodulo = CatSubmodulo::where('clave', '2.2')->first();
 
-        $query = parent::getEloquentQuery()
+        // El aislamiento Multi-Tenancy se aplica automáticamente vía BelongsToPlantel (PlantelScope)
+        return parent::getEloquentQuery()
             ->where('submodulo_id', $submodulo?->id ?? 0);
-
-        // Aislamiento Multi-Tenancy: Si el usuario tiene plantel asignado, solo ve su información
-        $user = Auth::user();
-        if ($user && ! $user->esNacional() && $user->plantel_id) {
-            $query->where('plantel_id', $user->plantel_id);
-        }
-
-        return $query;
     }
 
     public static function form(Form $form): Form
@@ -69,7 +63,10 @@ class MteResource extends Resource
 
                         Forms\Components\Select::make('plantel_id')
                             ->label('Instituto Tecnológico / Centro')
-                            ->options(CatPlantel::where('activo', true)->pluck('nombre', 'id'))
+                            ->options(fn () => $esNacional
+                                ? CatPlantel::where('activo', true)->pluck('nombre', 'id')
+                                : ($user?->plantel_id ? CatPlantel::where('id', $user->plantel_id)->pluck('nombre', 'id') : [])
+                            )
                             ->required()
                             ->searchable()
                             ->preload()

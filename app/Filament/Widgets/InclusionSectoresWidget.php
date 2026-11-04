@@ -21,8 +21,9 @@ class InclusionSectoresWidget extends Widget
             ?? CatPeriodo::orderByDesc('anio')->orderByDesc('trimestre')->first();
         $periodoId = $periodo?->id ?? 0;
 
-        // 2. Consulta de Registros del Periodo
-        $registros = RepRegistroBase::with('submodulo')
+        // 2. Consulta de Registros del Periodo (Consolidado nacional)
+        $registros = RepRegistroBase::deTodosLosPlanteles()
+            ->with('submodulo')
             ->where('periodo_id', $periodoId)
             ->get();
 
@@ -61,7 +62,7 @@ class InclusionSectoresWidget extends Widget
         ];
 
         foreach ($registrosMte as $reg) {
-            $sector = $reg->datos_especificos['sector_estrategico'] ?? null;
+            $sector = $reg->detalles_adicionales['sector_estrategico'] ?? $reg->datos_especificos['sector_estrategico'] ?? null;
             if ($sector && isset($sectoresConteo[$sector])) {
                 $sectoresConteo[$sector]++;
             }
@@ -109,7 +110,7 @@ class InclusionSectoresWidget extends Widget
         ];
 
         foreach ($registrosComextras as $reg) {
-            $modalidad = $reg->datos_especificos['tipo_modalidad'] ?? null;
+            $modalidad = $reg->detalles_adicionales['tipo_modalidad'] ?? $reg->datos_especificos['tipo_modalidad'] ?? null;
             if ($modalidad && isset($modalidadesConteo[$modalidad])) {
                 $modalidadesConteo[$modalidad] += ($reg->total_general ?? 1);
             }
